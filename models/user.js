@@ -17,7 +17,9 @@ const UserSchema = new Schema({
     },
     profilePicture: {
         type: String
-    }
+    },
+    isVerified: Boolean,
+    emailVerificationToken: String
 }, {
     timestamps: true
 });
