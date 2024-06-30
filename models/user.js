@@ -4,7 +4,8 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     username: {
-        type: String
+        type: String,
+        required: true
     },
     email: {
         type: String,
@@ -18,7 +19,10 @@ const UserSchema = new Schema({
     profilePicture: {
         type: String
     },
-    isVerified: Boolean,
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
     emailVerificationToken: String
 }, {
     timestamps: true
