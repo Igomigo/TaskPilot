@@ -1,1 +1,2 @@
 GET http://localhost:3000/ping
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjgyMTA5YjgyYjQxOTNhZjMxNmNmNzAiLCJpYXQiOjE3MTk4MDAxMTMsImV4cCI6MTcyMTAwOTcxM30.Tmpc-8oz3yhSd6kND6ITyUR2NW7O5wWz2t83QJsXAKE

@@ -7,6 +7,7 @@ const dotenv = require("dotenv").config();
 
 const dbConnect = require("./config/mongodbClient");
 const authRoute = require("./routes/authRoute");
+const authWare = require("./middlewares/authWare");
 
 // Initialize the express app
 const app = express();
@@ -24,7 +25,7 @@ app.use(cookie_parser());
 app.use("/auth", authRoute);
 
 // Test the server response
-app.get("/ping", (req, res) => {
+app.get("/ping", authWare, (req, res) => {
     res.status(200).json("Server says pong");
     console.log("Pong");
 });

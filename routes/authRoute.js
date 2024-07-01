@@ -6,10 +6,10 @@ const authWare = require("../middlewares/authWare");
 const authentication = require("../controllers/authEngine");
 
 // POST request to register a user
-router.post("/register", authWare, authentication.register);
+router.post("/register", authentication.register);
 
 // POST request to log a user in
-router.post("/login", authWare, authentication.login);
+router.post("/login", authentication.login);
 
 
 module.exports = router;
