@@ -6,6 +6,7 @@ const cookie_parser = require("cookie-parser");
 const dotenv = require("dotenv").config();
 
 const dbConnect = require("./config/mongodbClient");
+const authRoute = require("./routes/authRoute");
 
 // Initialize the express app
 const app = express();
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookie_parser());
+app.use("/auth", authRoute);
 
 // Test the server response
 app.get("/ping", (req, res) => {
