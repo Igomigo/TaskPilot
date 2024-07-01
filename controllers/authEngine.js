@@ -50,3 +50,32 @@ exports.register = async (req, res) => {
         return res.status(500).json({Error: err.message});
     }
 }
+
+exports.login = async (req, res) => {
+    // Logs a user in
+    try {
+        const {email, password} = req.body;
+        if (!email) {
+            return res.status(400).json({Error: "email missing"});
+        }
+        if (!password) {
+            return res.status(400).json({Error: "password missing"});
+        }
+        const user = await User.findOne({email: email});
+        if (!user) {
+            return res.status(404).json({Error: "user not found"});
+        }
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+            return res.status(401).json({Error: "invalid password"});
+        }
+        const token = jwt.sign(
+            {userId: user._id}, process.env.JWT_SECRET, {expiresIn: "14d"});
+        return res.status(200).json({
+            token: token
+        });
+    } catch (err) {
+        console.error(`${err}`);
+        res.status(500).json({Error: err.message});
+    }
+}
