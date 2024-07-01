@@ -1,10 +1,7 @@
 /**
  * The authentication engine of the server
  */
-
 const User = require("../models/user");
-const mongoClient = require("../config/mongodbClient");
-const redisClient = require("../config/redisClient");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
