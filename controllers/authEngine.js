@@ -4,6 +4,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const emailJob = require("../jobs/emailVerificationJob");
 
 async function hashpwd(pwd) {
     // Returns the hashed version of a password
@@ -37,6 +38,13 @@ exports.register = async (req, res) => {
         });
         await user.save();
         console.log(`User with email ${email} successfully created`);
+        // call the emailJob function set up a background email response porocess
+        emailJob(email, username).then(() => {
+            console.log("Verification email sent successfully");
+        }).catch((err) => {
+            console.log("Failed to send Verification email", err);
+        });
+
         return res.status(201).json({
             status: "success",
             message: "user created successfully",

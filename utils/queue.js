@@ -20,3 +20,5 @@ TaskQueue.on("failed", (job, err) => {
     console.log(`
         Job ${job.id} of type ${job.name} failed with error ${err.message}`);
 });
+
+module.exports = TaskQueue;
