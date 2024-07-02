@@ -20,10 +20,7 @@ exports.createBoard = async (req, res) => {
             owner: current_user._id
         });
         await board.save();
-        return res.status(201).json({
-            status: "success",
-            board: board
-        });
+        return res.status(201).json(board);
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({error: err.message});
@@ -76,7 +73,7 @@ exports.updateBoard = async (req, res) => {
             return res.status(404).json({});
         }
         // update the board manually
-        Object.keys[data].forEach(key => {
+        Object.keys(data).forEach(key => {
             board[key] = data[key]
         });
         board.updatedAt = Date.now();

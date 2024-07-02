@@ -1,4 +1,4 @@
-// Where the server lives
+// Root file to initialize the server
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
@@ -8,6 +8,7 @@ const dotenv = require("dotenv").config();
 const dbConnect = require("./config/mongodbClient");
 const authRoute = require("./routes/authRoute");
 const authWare = require("./middlewares/authWare");
+const boardRoute = require("./routes/boardRoute");
 
 // Initialize the express app
 const app = express();
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookie_parser());
 app.use("/auth", authRoute);
+app.use("/b", boardRoute);
 
 // Test the server response
 app.get("/ping", authWare, (req, res) => {

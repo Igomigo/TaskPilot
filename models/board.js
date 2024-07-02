@@ -6,7 +6,7 @@ const BoardSchema = new Schema({
     title: {
         type: String,
         required: true,
-        maxLength: 25
+        maxLength: 50
     },
     description: {
         type: String,
