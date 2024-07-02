@@ -19,7 +19,11 @@ const listSchema = new Schema({
     description: {
         type: String,
         maxLength: 100
-    }
+    },
+    cards: [{
+        type: Schema.Types.ObjectId,
+        ref: "Card"
+    }]
 }, {
     timestamps: true
 });
