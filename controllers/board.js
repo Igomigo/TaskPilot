@@ -50,8 +50,13 @@ exports.getBoardById = async (req, res) => {
     // Retrieves a single board data based on the id
     try {
         const id = req.params.id;
-        const board = await Board.findById(id);
-        if (board.length === 0) {
+        const board = await Board.findById(id).populate({
+            path: "lists",
+            populate: {
+                path: "cards"
+            }
+        }).exec();
+        if (!board) {
             return res.status(404).json({});
         }
         return res.status(200).json(board);

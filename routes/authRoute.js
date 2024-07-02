@@ -1,8 +1,7 @@
-// Handles routing
+// Authentication routes
 
 const express = require("express");
 const router = express.Router();
-const authWare = require("../middlewares/authWare");
 const authentication = require("../controllers/authEngine");
 
 // POST request to register a user
