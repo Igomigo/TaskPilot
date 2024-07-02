@@ -15,7 +15,7 @@ async function authWare (req, res, next) {
         if (!user) {
             return res.status(401).json({Error: "unauthorized: Invalid token"});
         }
-        req.currentUser = user;
+        req.current_user = user;
         next();
     } catch (err) {
         if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
