@@ -1,10 +1,12 @@
 // Contains controllers related to list management
 
 const List = require("../models/list");
+const Board = require("../models/board");
 
 exports.createList = async (req, res) => {
     // Creates a new list within a board
     try {
+        const boardId = req.params.boardId;
         const {title, description, position} = req.body;
         if (!title) {
             return res.status(400).json({error: "missing title"});
@@ -15,13 +17,20 @@ exports.createList = async (req, res) => {
         const list = new List({
             title: title,
             description: description,
-            position: position
+            position: position,
+            board: boardId,
+            createdBy: req.current_user._id
         });
-        await list.save();
-        return res.status(201).json(list);
+        const savedList = await list.save();
+        // update the board accordingly
+        await Board.findByIdAndUpdate(boardId,
+            {$push: {"lists": savedList._id}},
+            {new: true}
+        );
+        return res.status(201).json(savedList);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({error: "An error occured during list creation"});
     }
 }
 
@@ -52,6 +61,7 @@ exports.updateList = async (req, res) => {
         Object.keys(data).forEach(key => {
             list[key] = data[key];
         });
+        list.updatedAt = Date.now();
         await list.save();
         return res.status(200).json(list);
     } catch (err) {
@@ -68,6 +78,11 @@ exports.deleteList = async (req, res) => {
         if (!list) {
             return res.status(400).json({error: "List not found"});
         }
+        // Also delete the list id from the board's list field
+        const boardId = list.board;
+        await Board.findByIdAndUpdate(boardId, {
+            $pull: {lists: id}
+        });
         return res.status(200).json({
             message: "list deleted successfully"
         });

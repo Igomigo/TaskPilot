@@ -9,6 +9,7 @@ const dbConnect = require("./config/mongodbClient");
 const authRoute = require("./routes/authRoute");
 const authWare = require("./middlewares/authWare");
 const boardRoute = require("./routes/boardRoute");
+const listRoute = require("./routes/listRoute");
 
 // Initialize the express app
 const app = express();
@@ -25,6 +26,7 @@ app.use(morgan("dev"));
 app.use(cookie_parser());
 app.use("/auth", authRoute);
 app.use("/b", boardRoute);
+app.use("/b", listRoute);
 
 // Test the server response
 app.get("/ping", authWare, (req, res) => {

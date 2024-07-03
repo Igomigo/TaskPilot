@@ -1,2 +1,9 @@
-GET http://localhost:3000/ping
+POST http://localhost:3000/b/668421cca4f3f36989d3c593/list
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjgyMTA5YjgyYjQxOTNhZjMxNmNmNzAiLCJpYXQiOjE3MTk4MDAxMTMsImV4cCI6MTcyMTAwOTcxM30.Tmpc-8oz3yhSd6kND6ITyUR2NW7O5wWz2t83QJsXAKE
+Content-Type: application/application/json
+
+{
+    "title": "To do",
+    "description": "Task to be done by the team",
+    "position": 1
+}

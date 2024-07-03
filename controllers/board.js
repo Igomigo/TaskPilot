@@ -3,6 +3,7 @@
  */
 
 const Board = require("../models/board");
+const List = require("../models/list");
 
 exports.createBoard = async (req, res) => {
     // Creates a new board
@@ -93,6 +94,11 @@ exports.deleteBoard = async (req, res) => {
         if (!deletedBoard) {
             return res.status(404).json({message: "Board not found"});
         }
+        // delete the associated lists for that board
+        const listIds = deletedBoard.lists;
+        Promise.all(listIds.map(async (listId) => {
+            await List.findByIdAndDelete(listId);
+        }));
         return res.status(200).json({message: "Board deleted successfully"});
     } catch (err) {
         console.log(`${err}`);

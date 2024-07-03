@@ -14,7 +14,8 @@ const listSchema = new Schema({
     },
     board: {
         type: Schema.Types.ObjectId,
-        ref: "Board"
+        ref: "Board",
+        required: true
     },
     description: {
         type: String,
@@ -23,7 +24,12 @@ const listSchema = new Schema({
     cards: [{
         type: Schema.Types.ObjectId,
         ref: "Card"
-    }]
+    }],
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    }
 }, {
     timestamps: true
 });
