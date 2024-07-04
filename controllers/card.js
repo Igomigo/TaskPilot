@@ -21,8 +21,10 @@ exports.createCard = async (req, res) => {
         });
         const savedCard = await card.save();
         // update the list accordingly
-        await List.findByIdAndUpdate(listId, 
-            {$push: {"cards": savedCard._id}},
+        await List.findByIdAndUpdate(listId, {
+            $push: {"cards": savedCard._id},
+            updatedAt: Date.now()
+            },
             {new: true}
         );
         return res.status(201).json(savedCard);
@@ -85,9 +87,10 @@ exports.deleteCard = async (req, res) => {
         }
         // delete the card reference from the associated list
         await List.findByIdAndUpdate(card.listId, {
-            $pull: {cards: cardId}
+            $pull: {cards: cardId},
+            updatedAt: Date.now()
         });
-        return res.status(200).json({
+         return res.status(200).json({
             message: "Card and associated comments deleted successfully"
         });
     } catch (err) {

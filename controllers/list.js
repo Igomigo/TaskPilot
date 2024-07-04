@@ -26,7 +26,8 @@ exports.createList = async (req, res) => {
         const savedList = await list.save();
         // update the board accordingly
         await Board.findByIdAndUpdate(boardId,
-            {$push: {"lists": savedList._id}},
+            {$push: {"lists": savedList._id},
+            updatedAt: Date.now()},
             {new: true}
         );
         return res.status(201).json(savedList);
@@ -100,7 +101,8 @@ exports.deleteList = async (req, res) => {
         // delete the reference from the board document
         const boardId = list.board;
         await Board.findByIdAndUpdate(boardId, {
-            $pull: {lists: id}
+            $pull: {lists: id},
+            updatedAt: Date.now()
         });
         return res.status(200).json({
             message: "list deleted successfully"
