@@ -32,3 +32,43 @@ exports.createComment = async (req, res) => {
         });
     }
 }
+
+exports.getComments = async (req, res) => {
+    // Retrieve all comments for a particular card
+    try {
+        const cardId = req.params.cardId;
+        const comments = await Comment.find({card: cardId});
+        if (comments.length === 0) {
+            return res.status(404).json({error: "Comments not found"});
+        }
+        return res.status(200).json(comments);
+    } catch (err) {
+        console.log(`${err}`);
+        return res.status(500).json({
+            error: `An error occured internally: ${err.message}`
+        });
+    }
+}
+
+exports.deleteComment = async (req, res) => {
+    // Delete a comment
+    try {
+        const commentId = req.params.commentId;
+        const comment = await Comment.findById(commentId);
+        if (!comment) {
+            return res.status(404).json({error: "Comments not found"});
+        }
+        await Comment.findByIdAndDelete(commentId);
+        // Delete the ref from the card document
+        await Card.findByIdAndUpdate(comment.card, {
+            $pull: {comments: comment._id},
+            updatedAt: Date.now()
+        });
+    res.status(200).json({message: "Comments successfully deleted"});
+    } catch (err) {
+        console.log(`${err}`);
+        return res.status(500).json({
+            error: `An error occured internally: ${err.message}`
+        });
+    }
+}
