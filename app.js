@@ -10,6 +10,7 @@ const authRoute = require("./routes/authRoute");
 const authWare = require("./middlewares/authWare");
 const boardRoute = require("./routes/boardRoute");
 const listRoute = require("./routes/listRoute");
+const cardRoute = require("./routes/cardRoute");
 
 // Initialize the express app
 const app = express();
@@ -27,6 +28,7 @@ app.use(cookie_parser());
 app.use("/auth", authRoute);
 app.use("/b", boardRoute);
 app.use("/b", listRoute);
+app.use("/b", cardRoute);
 
 // Test the server response
 app.get("/ping", authWare, (req, res) => {

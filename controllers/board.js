@@ -4,6 +4,8 @@
 
 const Board = require("../models/board");
 const List = require("../models/list");
+const Card = require("../models/card");
+const Comment = require("../models/comment");
 
 exports.createBoard = async (req, res) => {
     // Creates a new board
@@ -24,7 +26,8 @@ exports.createBoard = async (req, res) => {
         return res.status(201).json(board);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An internal error occurred: ${err.message}`});
     }
 }
 
@@ -34,13 +37,14 @@ exports.getBoards = async (req, res) => {
         const current_user = req.current_user;
         const boards = await Board.find({owner: current_user._id});
         if (boards.length === 0) {
-            console.log("User has no board");
-            return res.status(404).json({});
+            console.log("Board not found");
+            return res.status(404).json({error: "Board not found"});
         }
         res.status(200).json(boards);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An internal error occured: ${err.message}`});
     }
 }
 
@@ -60,7 +64,8 @@ exports.getBoardById = async (req, res) => {
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An internal error occured: ${err.message}`});
     }
 }
 
@@ -71,7 +76,7 @@ exports.updateBoard = async (req, res) => {
         const data = req.body;
         const board = await Board.findById(id);
         if (!board) {
-            return res.status(404).json({});
+            return res.status(404).json({error: "Board not found"});
         }
         // update the board manually
         Object.keys(data).forEach(key => {
@@ -82,26 +87,41 @@ exports.updateBoard = async (req, res) => {
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An internal error occured: ${err.message}`});
     }
 }
 
 exports.deleteBoard = async (req, res) => {
-    // Deletes a particular board from the database
+    // Deletes a particular board and all associated data from the database
     try {
         const id = req.params.id;
-        const deletedBoard = await Board.findByIdAndDelete(id);
-        if (!deletedBoard) {
+        // find the board by id
+        const board = await Board.findById(id);
+        if (!board) {
             return res.status(404).json({message: "Board not found"});
         }
-        // delete the associated lists for that board
-        const listIds = deletedBoard.lists;
-        Promise.all(listIds.map(async (listId) => {
+        // delete the list and data for that board
+        const listIds = board.lists;
+        await Promise.all(listIds.map(async (listId) => {
+            const list = await List.findById(listId)
+            if (list) {
+                const cardIds = list.cards;
+                // iterate through to delete the comments and card data
+                await Promise.all(cardIds.map(async (cardId) => {
+                    await Comment.deleteMany({card: cardId});
+                    await Card.findByIdAndDelete(cardId);
+                }));
+            }
+            // delete the list
             await List.findByIdAndDelete(listId);
         }));
+        // Finally delete the board itelf
+        await Board.findByIdAndDelete(id);
         return res.status(200).json({message: "Board deleted successfully"});
     } catch (err) {
-        console.log(`${err}`);
-        res.status(500).json({error: err.message});
+        console.log(`Error deleting board: ${err.message}`);
+        res.status(500).json({
+            error: `An internal error occured: ${err.message}`});
     }
 }
