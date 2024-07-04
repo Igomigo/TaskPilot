@@ -2,6 +2,8 @@
 
 const List = require("../models/list");
 const Board = require("../models/board");
+const Card = require("../models/card");
+const Comment = require("../models/comment");
 
 exports.createList = async (req, res) => {
     // Creates a new list within a board
@@ -71,14 +73,25 @@ exports.updateList = async (req, res) => {
 }
 
 exports.deleteList = async (req, res) => {
-    // Delete a list from the board
+    // Delete a list and all associated data from the board
     try {
         const id = req.params.id;
-        const list = await List.findByIdAndDelete(id);
+        const list = await List.findById(id);
         if (!list) {
             return res.status(400).json({error: "List not found"});
         }
-        // Also delete the list id from the board's list field
+        // Delete all the associated data for the list
+        // Delete the comment and card data for that list
+        const cardIds = list.cards;
+        if (cardIds.length > 0) {
+            await Promise.all(cardIds.map(async (cardId) => {
+                await Comment.deleteMany({card: cardId});
+                await Card.findByIdAndDelete(cardId);
+            }));
+        }
+        // delete the actual list
+        await List.findByIdAndDelete(id);
+        // delete the reference from the board document
         const boardId = list.board;
         await Board.findByIdAndUpdate(boardId, {
             $pull: {lists: id}

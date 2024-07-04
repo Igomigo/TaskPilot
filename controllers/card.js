@@ -3,7 +3,7 @@
  */
 const Card = require("../models/card");
 const List = require("../models/list");
-//const Comment = require();
+const Comment = require("../models/comment");
 
 exports.createCard = async (req, res) => {
     // Creates a new card and updates the related list document
@@ -83,6 +83,10 @@ exports.deleteCard = async (req, res) => {
         if (!card) {
             return res.status(404).json({error: "Card not found"});
         }
+        // delete the card reference from the associated list
+        await List.findByIdAndUpdate(card.listId, {
+            $pull: {cards: cardId}
+        });
         return res.status(200).json({
             message: "Card and associated comments deleted successfully"
         });
