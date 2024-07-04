@@ -32,7 +32,9 @@ exports.createList = async (req, res) => {
         return res.status(201).json(savedList);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: "An error occured during list creation"});
+        return res.status(500).json({
+            error: `An error occured internally: ${err.message}`
+        });
     }
 }
 
@@ -47,7 +49,9 @@ exports.getLists = async (req, res) => {
         return res.status(200).json(list);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An error occured internally: ${err.message}`
+        });
     }
 }
 
@@ -68,7 +72,9 @@ exports.updateList = async (req, res) => {
         return res.status(200).json(list);
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An error occured internally: ${err.message}`
+        });
     }
 }
 
@@ -101,6 +107,8 @@ exports.deleteList = async (req, res) => {
         });
     } catch (err) {
         console.log(`${err}`);
-        return res.status(500).json({error: err.message});
+        return res.status(500).json({
+            error: `An error occured internally: ${err.message}`
+        });
     }
 }
