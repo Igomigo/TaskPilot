@@ -28,6 +28,6 @@ router.put("/:cardId/update", authWare, card.updateCard);
  * DELETE request to delete a card and related data
  * url: http://localhost:3000/b/:cardId/delete
  */
-router.delete("/:cardId", authWare, card.deleteCard);
+router.delete("/:cardId/delete", authWare, card.deleteCard);
 
 module.exports = router;

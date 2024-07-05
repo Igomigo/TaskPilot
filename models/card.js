@@ -30,9 +30,6 @@ const CardSchema = new Schema({
         ref: "User",
         required: true
     },
-    labels: [{
-        type: String
-    }]
 }, {
     timestamps: true
 });
