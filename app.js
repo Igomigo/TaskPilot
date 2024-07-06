@@ -13,6 +13,7 @@ const boardRoute = require("./routes/boardRoute");
 const listRoute = require("./routes/listRoute");
 const cardRoute = require("./routes/cardRoute");
 const commentRoute = require("./routes/commentRoute");
+const logRoute = require("./routes/activityLogRoutes");
 
 // Initialize the express app
 const app = express();
@@ -33,6 +34,7 @@ app.use("/b", boardRoute);
 app.use("/b", listRoute);
 app.use("/b", cardRoute);
 app.use("/c", commentRoute);
+app.use("/b", logRoute);
 
 // Test the server response
 app.get("/ping", authWare, (req, res) => {
