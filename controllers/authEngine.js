@@ -41,6 +41,7 @@ exports.register = async (req, res) => {
         // call the emailJob function set up a background email response porocess
         emailJob(email, username).then(() => {
             console.log("Verification email sent successfully");
+            user
         }).catch((err) => {
             console.log("Failed to send Verification email", err);
         });
