@@ -4,6 +4,7 @@ const List = require("../models/list");
 const Board = require("../models/board");
 const Card = require("../models/card");
 const Comment = require("../models/comment");
+const ActivityLog = require("../models/activityLog");
 
 exports.createList = async (req, res) => {
     // Creates a new list within a board
@@ -30,6 +31,16 @@ exports.createList = async (req, res) => {
             updatedAt: Date.now()},
             {new: true}
         );
+        const logger = new ActivityLog({
+            action: "create",
+            entity: "List",
+            entityId: list._id,
+            detail: `${req.current_user.username} created ${list.title}`,
+            createdBy: req.current_user.username,
+            boardId: boardId,
+            listId: list._id
+        });
+        await logger.save();
         return res.status(201).json(savedList);
     } catch (err) {
         console.log(`${err}`);
@@ -61,13 +72,32 @@ exports.updateList = async (req, res) => {
     try {
         const id = req.params.id;
         const data = req.body;
+        const current_user = req.current_user;
         const list = await List.findById(id);
         if (!list) {
             return res.status(400).json({error: "Not found"});
         }
+        // prepare the log details
+        let logDetails = [];
         Object.keys(data).forEach(key => {
-            list[key] = data[key];
+            if (list[key] !== data[key]) {
+                logDetails.push(
+                    `${current_user.username} changed ${list[key]} to ${data[key]}`);
+                    list[key] = data[key];
+            }
         });
+        if (logDetails.length > 0) {
+            logger = new ActivityLog({
+                action: "Update",
+                entity: "List",
+                entityId: list._id,
+                details: logDetails.join("; "),
+                createdBy: current_user._id,
+                boardId: list.board,
+                listId: list._id
+            });
+            await logger.save();
+        }
         list.updatedAt = Date.now();
         await list.save();
         return res.status(200).json(list);
@@ -78,7 +108,7 @@ exports.updateList = async (req, res) => {
         });
     }
 }
-
+ 
 exports.deleteList = async (req, res) => {
     // Delete a list and all associated data from the board
     try {
@@ -104,6 +134,18 @@ exports.deleteList = async (req, res) => {
             $pull: {lists: id},
             updatedAt: Date.now()
         });
+        // Log the delete activity
+        let logDetails = `${req.current_user.username} deleted ${list.title} from this board`
+        const logger = new ActivityLog({
+            action: "delete",
+            entity: "List",
+            entityId: list._id,
+            details: logDetails,
+            createdBy: req.current_user._id,
+            boardId: boardId,
+            listId: list._id
+        });
+        await logger.save();
         return res.status(200).json({
             message: "list deleted successfully"
         });

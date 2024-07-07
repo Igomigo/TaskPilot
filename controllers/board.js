@@ -6,7 +6,7 @@ const Board = require("../models/board");
 const List = require("../models/list");
 const Card = require("../models/card");
 const Comment = require("../models/comment");
-const log = require("../models/activityLog");
+const ActivityLog = require("../models/activityLog");
 
 exports.createBoard = async (req, res) => {
     // Creates a new board
@@ -25,8 +25,15 @@ exports.createBoard = async (req, res) => {
         });
         await board.save();
         // Populate the activity log
-        const log = log({});
-        await log.save();
+        const logger = new ActivityLog({
+            action: "create",
+            entity: "board",
+            entityId: board._id,
+            details: `${current_user.username} created this board`,
+            createdBy: current_user._id,
+            boardId: board._id,
+        });
+        await logger.save();
         return res.status(201).json(board);
     } catch (err) {
         console.log(`${err}`);

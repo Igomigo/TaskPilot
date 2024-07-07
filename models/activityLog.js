@@ -35,11 +35,9 @@ const LogSchema = new Schema({
     cardId: {
         type: Schema.Types.ObjectId,
         ref: "Card"
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
     }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model("ActivityLog", LogSchema);
