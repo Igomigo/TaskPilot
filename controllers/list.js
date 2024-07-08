@@ -28,7 +28,7 @@ exports.createList = async (req, res) => {
         // update the board accordingly
         await Board.findByIdAndUpdate(boardId,
             {$push: {"lists": savedList._id},
-            updatedAt: Date.now()},
+            updatedAt: Date.now( )},
             {new: true}
         );
         const logger = new ActivityLog({
