@@ -46,7 +46,12 @@ exports.getBoards = async (req, res) => {
     // Retrieves all boards for the current user
     try {
         const current_user = req.current_user;
-        const boards = await Board.find({owner: current_user._id});
+        const boards = await Board.find({
+            $or: [
+                {owner: current_user._id},
+                {members: {$in: [current_user._Id]}}
+            ]
+        });
         if (boards.length === 0) {
             console.log("Board not found");
             return res.status(404).json({error: "Board not found"});
