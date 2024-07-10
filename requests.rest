@@ -1,7 +1,3 @@
-POST http://localhost:3000/c/6685e101ee3ca154bacefa2c/comment
+GET http://localhost:3000/b/activity/668421cca4f3f36989d3c593
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjgyMTA5YjgyYjQxOTNhZjMxNmNmNzAiLCJpYXQiOjE3MTk4MDAxMTMsImV4cCI6MTcyMTAwOTcxM30.Tmpc-8oz3yhSd6kND6ITyUR2NW7O5wWz2t83QJsXAKE
-Content-Type: application/json
-
-{
-    "text": "I just completed the whole task, everyone can relax :)"
-}
+//Content-Type: application/json
