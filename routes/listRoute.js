@@ -21,13 +21,13 @@ router.get("/lists", authWare, list.getLists);
  * PUT request to update a particular list data
  * url: http://localhost:3000/b/list/:id
  */
-router.put("/list/:id", authWare, list.updateList);
+router.put("/list/:listId", authWare, list.updateList);
 
 /**
  * DELETE request to delete a particular list data
  * url: http://localhost:3000/b/list/:id
  */
-router.delete("/list/:id", authWare, list.deleteList);
+router.delete("/list/:listId", authWare, list.deleteList);
 
 
 module.exports = router;

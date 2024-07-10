@@ -111,6 +111,13 @@ exports.deleteCard = async (req, res) => {
     try {
         // Delete a card and associated data
         const cardId = req.params.cardId;
+        const current_user = req.current_user;
+        const theCard = await Card.findById(cardId);
+        if (current_user._id.toString() !== theCard.createdBy.toString()) {
+            return res.status(403).json({
+                message: "You are not permitted to delete this card"
+            });
+        }
         // first delete the comment within that card
         await Comment.deleteMany({card: cardId});
         // Then delete the card itself

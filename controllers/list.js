@@ -70,10 +70,10 @@ exports.getLists = async (req, res) => {
 exports.updateList = async (req, res) => {
     // updates a list data
     try {
-        const id = req.params.id;
+        const listId = req.params.listId;
         const data = req.body;
         const current_user = req.current_user;
-        const list = await List.findById(id);
+        const list = await List.findById(listId);
         if (!list) {
             return res.status(404).json({error: "Not found"});
         }
@@ -112,8 +112,14 @@ exports.updateList = async (req, res) => {
 exports.deleteList = async (req, res) => {
     // Delete a list and all associated data from the board
     try {
-        const id = req.params.id;
-        const list = await List.findById(id);
+        const listId = req.params.listId;
+        const list = await List.findById(listId);
+        const current_user = req.current_user;
+        if (current_user._id.toString() !== list.createdBy.toString()) {
+            return res.status(403).json({
+                message: "You are not permitted to delete this list"
+            });
+        }
         if (!list) {
             return res.status(400).json({error: "List not found"});
         }
@@ -127,11 +133,11 @@ exports.deleteList = async (req, res) => {
             }));
         }
         // delete the actual list
-        await List.findByIdAndDelete(id);
+        await List.findByIdAndDelete(listId);
         // delete the reference from the board document
         const boardId = list.board;
         await Board.findByIdAndUpdate(boardId, {
-            $pull: {lists: id},
+            $pull: {lists: listId},
             updatedAt: Date.now()
         });
         // Log the delete activity
