@@ -2,6 +2,7 @@
  * Contains controllers related to board management
  */
 
+const User = require("../models/user");
 const Board = require("../models/board");
 const List = require("../models/list");
 const Card = require("../models/card");
@@ -118,6 +119,45 @@ exports.updateBoard = async (req, res) => {
         }
         board.updatedAt = Date.now();
         await board.save();
+        return res.status(200).json(board);
+    } catch (err) {
+        console.log(`${err}`);
+        return res.status(500).json({
+            error: `An internal error occured: ${err.message}`});
+    }
+}
+
+exports.addMember = async (req, res) => {
+    // Adds a member to the board.members field
+    try {
+        const boardId = req.params.boardId;
+        const current_user = req.current_user;
+        const { email } = req.body;
+        const board = await Board.findById(boardId);
+        if (!board) {
+            console.log(`Board <${board.title}> not found`);
+            return res.status(404).json({message: "Board not found"});
+        }
+        const user = await User.findOne({email: email});
+        if (user && board.members.includes(user._id)) {
+            console.log("Member already exists in the board");
+            return res.status(409).json({
+                message: "User already exists in the board"
+            });
+        }
+        // add member to the board
+        board.members.push(user._id);
+        await board.save();
+        // log the activity
+        const logger = new ActivityLog({
+            action: "Add member",
+            entity: "Board",
+            entityId: boardId,
+            details: `${current_user.username} added ${email} to this board`,
+            createdBy: current_user._id,
+            boardId: boardId,
+        });
+        await logger.save()
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);
