@@ -31,6 +31,18 @@ router.get("/:id", authWare, permission.permitUser, board.getBoardById);
 router.put("/update/:id", authWare, board.updateBoard);
 
 /**
+ * POST request top add a user to the board
+ * url: http://localhost:3000/b/addmember/:boardId
+ */
+router.post("/addmember/:boardId", authWare, board.addMember);
+
+/**
+ * DELETE request to remove a user from the board
+ * url: http://localhost:3000/b/:boardId/removemember/:userId
+ */
+router.delete("/:boardId/deletemember/:userId", authWare, board.removeMember);
+
+/**
  * DELETE request to delete a particular board
  * url: http://localhost:3000/b/:id
  */

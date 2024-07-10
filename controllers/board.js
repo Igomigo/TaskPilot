@@ -162,7 +162,46 @@ exports.addMember = async (req, res) => {
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
-            error: `An internal error occured: ${err.message}`});
+            error: `An internal error occured: ${err.message}`
+        });
+    }
+}
+
+exports.removeMember = async (req, res) => {
+    // Removes a member from the board
+    try {
+        const { boardId, userId } = req.params;
+        const current_user = req.current_user;
+        const board = await Board.findById(boardId);
+        if (!board) {
+            return res.status(404).json({error: "Board not found"});
+        }
+        const userIndex = board.members.indexOf(userId);
+        if (userIndex === -1) {
+            return res.status(400).json({
+                error: "User not a member of the board"
+            });
+        }
+        // remove user from the board
+        board.members.splice(userIndex, 1);
+        await board.save();
+        // log the activity
+        const user = await User.findById(userId);
+        const logger = new ActivityLog({
+            action: "remove member",
+            entity: "Board",
+            entityId: boardId,
+            details: `${current_user.username} removed ${user.email} from the board`,
+            createdBy: current_user._id,
+            boardId: boardId
+        });
+        await logger.save();
+        return res.status(200).json({message: "User successfully removed from the board"});
+    } catch (err) {
+        console.log(`${err}`);
+        return res.status(500).json({
+            error: `An internal error occured: ${err.message}`
+        }); 
     }
 }
 
