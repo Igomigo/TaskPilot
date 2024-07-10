@@ -1,4 +1,4 @@
-// Middleware that checks that a user is permitted to see a board
+// Middlewares that inject strict permission measures on the board
 const Board = require("../models/board");
 
 exports.permitUser = async (req, res, next) => {
@@ -16,6 +16,24 @@ exports.permitUser = async (req, res, next) => {
         });
         if (!board) {
             return res.status(403).json({message: "You do not have poermission to access this board"});
+        }
+        next();
+    } catch (err) {
+        return res.status(500).json({message: "Server error", error: err});
+    }
+}
+
+exports.addRemDelPermission = async (req, res, next) => {
+    // Ensures that only the creator of the board can add and remove users
+    // as well as delete the board
+    try {
+        const boardId = req.params.boardId;
+        const current_user = req.current_user;
+        const board = await Board.findById(boardId);
+        if (current_user._id !== board.owner) {
+            return res.status(403).json({
+                message: "You are not permitted to carry out this operation"
+            });
         }
         next();
     } catch (err) {

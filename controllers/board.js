@@ -208,9 +208,9 @@ exports.removeMember = async (req, res) => {
 exports.deleteBoard = async (req, res) => {
     // Deletes a particular board and all associated data from the database
     try {
-        const id = req.params.id;
+        const boardId = req.params.boardId;
         // find the board by id
-        const board = await Board.findById(id);
+        const board = await Board.findById(boardId);
         if (!board) {
             return res.status(404).json({message: "Board not found"});
         }

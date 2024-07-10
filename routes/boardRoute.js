@@ -46,7 +46,7 @@ router.delete("/:boardId/deletemember/:userId", authWare, board.removeMember);
  * DELETE request to delete a particular board
  * url: http://localhost:3000/b/:id
  */
-router.delete("/delete/:id", authWare, board.deleteBoard);
+router.delete("/delete/:boardId", authWare, board.deleteBoard);
 
 
 module.exports = router;
