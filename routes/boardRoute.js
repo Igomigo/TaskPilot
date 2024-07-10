@@ -2,6 +2,7 @@
 
 const board = require("../controllers/board");
 const authWare = require("../middlewares/authWare");
+const permission = require("../middlewares/boardPermissions");
 const express = require("express");
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.get("/", authWare, board.getBoards);
  * GET request to retrieve a particular board and it's associated data
  * url: http://localhost:3000/b/:id
  */
-router.get("/:id", authWare, board.getBoardById);
+router.get("/:id", authWare, permission.permitUser, board.getBoardById);
 
 /**
  * PUT request to update a particular board data
