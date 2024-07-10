@@ -34,19 +34,28 @@ router.put("/update/:id", authWare, board.updateBoard);
  * POST request top add a user to the board
  * url: http://localhost:3000/b/addmember/:boardId
  */
-router.post("/addmember/:boardId", authWare, board.addMember);
+router.post(
+    "/addmember/:boardId", authWare,
+    permission.addRemDelPermission, board.addMember
+);
 
 /**
  * DELETE request to remove a user from the board
  * url: http://localhost:3000/b/:boardId/removemember/:userId
  */
-router.delete("/:boardId/deletemember/:userId", authWare, board.removeMember);
+router.delete(
+    "/:boardId/deletemember/:userId", authWare,
+    permission.addRemDelPermission, board.removeMember
+);
 
 /**
  * DELETE request to delete a particular board
  * url: http://localhost:3000/b/:id
  */
-router.delete("/delete/:boardId", authWare, board.deleteBoard);
+router.delete(
+    "/delete/:boardId", authWare,
+    permission.addRemDelPermission, board.deleteBoard
+);
 
 
 module.exports = router;
