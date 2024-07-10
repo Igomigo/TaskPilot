@@ -8,7 +8,12 @@ exports.permitUser = async (req, res, next) => {
         const boardId = req.params.boardId;
         const current_user = req.current_user;
         const userId = current_user._id
-        const board = await Board.findOne({_id: boardId, members: {$in: [userId]}});
+        const board = await Board.findOne({_id: boardId,
+            $or: [
+                {owner: current_user._id},
+                {members: {$in: [current_user._id]}}
+            ]
+        });
         if (!board) {
             return res.status(403).json({message: "You do not have poermission to access this board"});
         }
