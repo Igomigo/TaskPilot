@@ -30,7 +30,7 @@ exports.addRemDelPermission = async (req, res, next) => {
         const boardId = req.params.boardId;
         const current_user = req.current_user;
         const board = await Board.findById(boardId);
-        if (current_user._id !== board.owner) {
+        if (current_user._id.toString() !== board.owner.toString()) {
             return res.status(403).json({
                 message: "You are not permitted to carry out this operation"
             });
