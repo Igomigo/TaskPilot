@@ -87,7 +87,7 @@ exports.deleteComment = async (req, res) => {
             updatedAt: Date.now()
         }, { new: true });
         // Collect the list the card references
-        const list = await List.find({cards: {$in: [card._id]}});
+        const list = await List.findOne({cards: {$in: [card._id]}});
         if (!list) {
             // Incase no list is found
             console.log('No list found containing the specified cardId');

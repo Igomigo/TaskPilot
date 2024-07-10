@@ -85,14 +85,32 @@ exports.updateBoard = async (req, res) => {
     try {
         const id = req.params.id;
         const data = req.body;
+        const current_user = req.current_user;
         const board = await Board.findById(id);
         if (!board) {
             return res.status(404).json({error: "Board not found"});
         }
-        // update the board manually
+        // set up log details
+        const logDetails = [];
+        // update the board manually and implement logging
         Object.keys(data).forEach(key => {
-            board[key] = data[key]
+            if (board[key] !== data[key]) {
+                const msg = `${current_user.username} changed ${key} from ${board[key]} to ${data[key]}`
+                logDetails.push(msg);
+                board[key] = data[key]
+            }
         });
+        if (logDetails.length > 0) {
+            const logger = new ActivityLog({
+                action: "update",
+                entity: "Board",
+                entityId: board._id,
+                details: logDetails.join("; "),
+                boardId: board._id,
+                createdBy: current_user._id
+            });
+            await logger.save();
+        }
         board.updatedAt = Date.now();
         await board.save();
         return res.status(200).json(board);

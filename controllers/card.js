@@ -34,7 +34,7 @@ exports.createCard = async (req, res) => {
             action: "create",
             entity: "card",
             entityId: card._id,
-            details: `${current_user.username} created this card`,
+            details: `${current_user.username} created the card: ${card.title}`,
             createdBy: current_user._id,
             boardId: list.board,
             listId: list._id,
@@ -88,11 +88,11 @@ exports.updateCard = async (req, res) => {
         if (logDetails.length > 0) {
             const logger = new ActivityLog({
                 action: "Update",
-                entity: "List",
+                entity: "card",
                 entityId: list._id,
                 details: logDetails.join("; "),
                 createdBy: req.current_user._id,
-                boardId: card.board,
+                boardId: list.board,
                 listId: list._id
             });
             await logger.save();
@@ -130,7 +130,7 @@ exports.deleteCard = async (req, res) => {
             entity: "Card",
             entityId: card._id,
             details: `${req.current_user.username} deleted the card titled ${card.title}`,
-            createdBy: req.current_user.username,
+            createdBy: req.current_user._id,
             boardId: list.board,
             listId: list._id,
             cardId: card._id

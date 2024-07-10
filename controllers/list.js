@@ -35,8 +35,8 @@ exports.createList = async (req, res) => {
             action: "create",
             entity: "List",
             entityId: list._id,
-            detail: `${req.current_user.username} created ${list.title}`,
-            createdBy: req.current_user.username,
+            details: `${req.current_user.username} created ${list.title}`,
+            createdBy: req.current_user._id,
             boardId: boardId,
             listId: list._id
         });
@@ -75,14 +75,14 @@ exports.updateList = async (req, res) => {
         const current_user = req.current_user;
         const list = await List.findById(id);
         if (!list) {
-            return res.status(400).json({error: "Not found"});
+            return res.status(404).json({error: "Not found"});
         }
         // prepare the log details
         let logDetails = [];
         Object.keys(data).forEach(key => {
             if (list[key] !== data[key]) {
                 logDetails.push(
-                    `${current_user.username} changed ${list[key]} to ${data[key]}`);
+                    `${current_user.username} changed list from ${list[key]} to ${data[key]}`);
                     list[key] = data[key];
             }
         });
