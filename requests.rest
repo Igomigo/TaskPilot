@@ -1,3 +1,7 @@
-GET http://localhost:3000/b/activity/668421cca4f3f36989d3c593
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjgyMTA5YjgyYjQxOTNhZjMxNmNmNzAiLCJpYXQiOjE3MTk4MDAxMTMsImV4cCI6MTcyMTAwOTcxM30.Tmpc-8oz3yhSd6kND6ITyUR2NW7O5wWz2t83QJsXAKE
-//Content-Type: application/json
+GET http://localhost:3000/b/addmember/668c2772260365e4cdd9344c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NjhmYzY5ZWEyYWY1YTE4MmQ1OGZmOTYiLCJpYXQiOjE3MjA2OTg2NTcsImV4cCI6MTcyMTkwODI1N30.00SMmQHp0kCw5ob7OfEetqvpWpPVs7tmiP4K9lsG3nI
+Content-Type: application/json
+
+{
+    "email": "amfat@mail.com"
+}

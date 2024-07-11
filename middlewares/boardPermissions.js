@@ -7,7 +7,6 @@ exports.permitUser = async (req, res, next) => {
     try {
         const boardId = req.params.boardId;
         const current_user = req.current_user;
-        const userId = current_user._id
         const board = await Board.findOne({_id: boardId,
             $or: [
                 {owner: current_user._id},

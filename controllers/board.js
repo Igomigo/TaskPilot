@@ -50,12 +50,12 @@ exports.getBoards = async (req, res) => {
         const boards = await Board.find({
             $or: [
                 {owner: current_user._id},
-                {members: {$in: [current_user._Id]}}
+                {members: {$in: [current_user._id]}}
             ]
         });
         if (boards.length === 0) {
-            console.log("Board not found");
-            return res.status(404).json({error: "Board not found"});
+            console.log("No board found");
+            return res.status(404).json({error: "You have not created any board yet"});
         }
         res.status(200).json(boards);
     } catch (err) {
@@ -68,8 +68,8 @@ exports.getBoards = async (req, res) => {
 exports.getBoardById = async (req, res) => {
     // Retrieves a single board data based on the id
     try {
-        const id = req.params.id;
-        const board = await Board.findById(id).populate({
+        const boardId = req.params.boardId;
+        const board = await Board.findById(boardId).populate({
             path: "lists",
             populate: {
                 path: "cards"
@@ -101,7 +101,8 @@ exports.updateBoard = async (req, res) => {
         // update the board manually and implement logging
         Object.keys(data).forEach(key => {
             if (board[key] !== data[key]) {
-                const msg = `${current_user.username} changed ${key} from ${board[key]} to ${data[key]}`
+                console.log("Constructing the activity log details");
+                const msg = `${current_user.username} changed board ${key} from ${board[key]} to ${data[key]}`
                 logDetails.push(msg);
                 board[key] = data[key]
             }
@@ -116,6 +117,7 @@ exports.updateBoard = async (req, res) => {
                 createdBy: current_user._id
             });
             await logger.save();
+            console.log("update board Log activity successfully saved");
         }
         board.updatedAt = Date.now();
         await board.save();

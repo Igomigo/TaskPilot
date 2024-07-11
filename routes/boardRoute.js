@@ -20,9 +20,9 @@ router.get("/", authWare, board.getBoards);
 
 /**
  * GET request to retrieve a particular board and it's associated data
- * url: http://localhost:3000/b/:id
+ * url: http://localhost:3000/b/:boardId
  */
-router.get("/:id", authWare, permission.permitUser, board.getBoardById);
+router.get("/:boardId", authWare, permission.permitUser, board.getBoardById);
 
 /**
  * PUT request to update a particular board data
@@ -50,7 +50,7 @@ router.delete(
 
 /**
  * DELETE request to delete a particular board
- * url: http://localhost:3000/b/:id
+ * url: http://localhost:3000/b/delete/:boardId
  */
 router.delete(
     "/delete/:boardId", authWare,

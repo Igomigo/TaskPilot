@@ -3,6 +3,7 @@
  */
 const Card = require("../models/card");
 const List = require("../models/list");
+const Board = require("../models/board");
 const Comment = require("../models/comment");
 const ActivityLog = require("../models/activityLog");
 
@@ -113,7 +114,10 @@ exports.deleteCard = async (req, res) => {
         const cardId = req.params.cardId;
         const current_user = req.current_user;
         const theCard = await Card.findById(cardId);
-        if (current_user._id.toString() !== theCard.createdBy.toString()) {
+        const theList = await List.findById(theCard.listId);
+        const board = await Board.findById(theList.board);
+        if (current_user._id.toString() !== theCard.createdBy.toString(
+        ) && current_user._id.toString() !== board.owner.toString()) {
             return res.status(403).json({
                 message: "You are not permitted to delete this card"
             });
@@ -136,7 +140,7 @@ exports.deleteCard = async (req, res) => {
             action: "delete",
             entity: "Card",
             entityId: card._id,
-            details: `${req.current_user.username} deleted the card titled ${card.title}`,
+            details: `${req.current_user.username} deleted the card titled: ${card.title}`,
             createdBy: req.current_user._id,
             boardId: list.board,
             listId: list._id,

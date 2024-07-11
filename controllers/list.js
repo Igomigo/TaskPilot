@@ -114,8 +114,10 @@ exports.deleteList = async (req, res) => {
     try {
         const listId = req.params.listId;
         const list = await List.findById(listId);
+        const board = await Board.findById(list.board);
         const current_user = req.current_user;
-        if (current_user._id.toString() !== list.createdBy.toString()) {
+        if (current_user._id.toString() !== list.createdBy.toString(
+        ) && current_user._id.toString() !== board.owner.toString()) {
             return res.status(403).json({
                 message: "You are not permitted to delete this list"
             });
