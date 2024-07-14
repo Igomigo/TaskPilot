@@ -41,6 +41,10 @@ exports.createList = async (req, res) => {
             listId: list._id
         });
         await logger.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("createList", savedList);
+        // return a response to the client
         return res.status(201).json(savedList);
     } catch (err) {
         console.log(`${err}`);
@@ -100,6 +104,10 @@ exports.updateList = async (req, res) => {
         }
         list.updatedAt = Date.now();
         await list.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("updateList", list);
+        // return a response to the client
         return res.status(200).json(list);
     } catch (err) {
         console.log(`${err}`);
@@ -154,6 +162,10 @@ exports.deleteList = async (req, res) => {
             listId: list._id
         });
         await logger.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("deleteList", list);
+        // return a response to the client
         return res.status(200).json({
             message: "list deleted successfully"
         });

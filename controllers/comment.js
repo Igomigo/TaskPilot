@@ -45,6 +45,10 @@ exports.createComment = async (req, res) => {
             cardId: cardId
         });
         await logger.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("createComment", comment);
+        // return a response to the client
         return res.status(201).json(comment);
     } catch (err) {
         console.log(`${err}`);
@@ -104,6 +108,10 @@ exports.deleteComment = async (req, res) => {
             cardId: card._id
         });
         await logger.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("deleteComment", comment);
+        // return a response to the client
         res.status(200).json({message: "Comments successfully deleted"});
     } catch (err) {
         console.log(`${err}`);

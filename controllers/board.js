@@ -35,6 +35,10 @@ exports.createBoard = async (req, res) => {
             boardId: board._id,
         });
         await logger.save();
+        // emit the event to all connected clients of this board
+        const io = req.app.get("socketio");
+        io.to(board._id).emit("createBoard", board);
+        // return a response to the client
         return res.status(201).json(board);
     } catch (err) {
         console.log(`${err}`);
@@ -121,6 +125,10 @@ exports.updateBoard = async (req, res) => {
         }
         board.updatedAt = Date.now();
         await board.save();
+        // emit the update event to all clients connected
+        const io = req.app.get("socketio");
+        io.to(board._id).emit("updateBoard", board);
+        // return a response to the client
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);
@@ -160,6 +168,10 @@ exports.addMember = async (req, res) => {
             boardId: boardId,
         });
         await logger.save()
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(board._id).emit("addMember", board);
+        // return a response to the client
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);
@@ -198,7 +210,14 @@ exports.removeMember = async (req, res) => {
             boardId: boardId
         });
         await logger.save();
-        return res.status(200).json({message: "User successfully removed from the board"});
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(board._id).emit("removeMember", board);
+        // return a response to the client
+        return res.status(200).json({
+            message: "User successfully removed from the board",
+            data: board
+        });
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
@@ -233,6 +252,10 @@ exports.deleteBoard = async (req, res) => {
         }));
         // Finally delete the board itelf
         await Board.findByIdAndDelete(id);
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(board._id).emit("deleteBoard", board);
+        // return a response to the client
         return res.status(200).json({message: "Board deleted successfully"});
     } catch (err) {
         console.log(`Error deleting board: ${err.message}`);

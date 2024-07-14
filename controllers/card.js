@@ -42,6 +42,10 @@ exports.createCard = async (req, res) => {
             cardId: card._id
         });
         await logger.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("createCard", savedCard);
+        // return a response to the client
         return res.status(201).json(savedCard);
     } catch (err) {
         console.log(`${err}`);
@@ -100,6 +104,10 @@ exports.updateCard = async (req, res) => {
         }
         card.updatedAt = Date.now();
         await card.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("updateCard", card);
+        // return a response to the client
         return res.status(200).json(card);
     } catch (err) {
         return res.status(500).json({
@@ -147,6 +155,10 @@ exports.deleteCard = async (req, res) => {
             cardId: card._id
         });
         await logger.save();
+        // emit the event to all connected clients
+        const io = req.app.get("socketio");
+        io.to(list.board).emit("deleteCard", card);
+        // return a response to the client
         return res.status(200).json({
             message: "Card and associated comments deleted successfully"
         });
