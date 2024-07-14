@@ -14,7 +14,7 @@ module.exports = (io) => {
             socket.leave(boardId);
             console.log("Client left the board:", boardId);
         });
-        
+
         // Handle disconnections
         socket.on("disconnection", () => {
             console.log("Client disconnected")
