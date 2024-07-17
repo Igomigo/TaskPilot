@@ -1,0 +1,116 @@
+/* General styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Container styles */
+.container {
+    background: #1c1c1c;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Form styles */
+.form-container {
+    padding: 20px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #333;
+    color: #0ff;
+    box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+input:focus {
+    background: #444;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
+    outline: none;
+}
+
+/* Button styles */
+.register-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #0ff;
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.register-button:hover {
+    background: #00b3b3;
+    box-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 0 0 45px #0ff;
+}
+
+/* Redirect login styles */
+.redirect-login {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+.redirect-login a {
+    color: #0ff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.redirect-login a:hover {
+    color: #00b3b3;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+        box-shadow: none;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        box-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 0 0 45px #0ff;
+    }
+}
