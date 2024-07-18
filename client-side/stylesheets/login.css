@@ -70,7 +70,7 @@ input:focus {
   box-shadow: 0 0 10px var(--neon-blue);
 }
 
-.register-button {
+.login-button {
   width: 100%;
   padding: 10px;
   border: none;
@@ -82,24 +82,24 @@ input:focus {
   transition: all 0.3s ease;
 }
 
-.register-button:hover {
+.login-button:hover {
   background-color: var(--neon-blue);
   box-shadow: 0 0 15px var(--neon-blue);
 }
 
-.redirect-login {
+.redirect-register {
   text-align: center;
   margin-top: 20px;
   color: white;
 }
 
-.redirect-login a {
+.redirect-register a {
   color: var(--neon-pink);
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
-.redirect-login a:hover {
+.redirect-register a:hover {
   text-shadow: 0 0 10px var(--neon-pink);
 }
 
