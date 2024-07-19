@@ -17,17 +17,17 @@ exports.register = async (req, res) => {
     try {
         const {username, email, password} = req.body;
         if (!username) {
-            return res.status(400).json({Error: "Username missing"});
+            return res.status(400).json({error: "Username missing"});
         }
         if (!email) {
-            return res.status(400).json({Error: "Email missing"});
+            return res.status(400).json({error: "Email missing"});
         }
         if (!password) {
-            return res.status(400).json({Error: "Password missing"});
+            return res.status(400).json({error: "Password missing"});
         }
         const exists = await User.findOne({email: email});
         if (exists) {
-            return res.status(409).json({Error: "User already exists"});
+            return res.status(409).json({error: "User already exists"});
         }
         // Hash the password before saving account to the database
         const hashedpwd = await hashpwd(password);
@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
         });
     } catch (err) {
         console.error(`${err}`);
-        return res.status(500).json({Error: err.message});
+        return res.status(500).json({error: err.message});
     }
 }
 
@@ -62,18 +62,20 @@ exports.login = async (req, res) => {
     try {
         const {email, password} = req.body;
         if (!email) {
-            return res.status(400).json({Error: "email missing"});
+            console.log("email not provided");
+            return res.status(400).json({error: "email missing"});
         }
         if (!password) {
-            return res.status(400).json({Error: "password missing"});
+            console.log("Password not provided");
+            return res.status(400).json({error: "password missing"});
         }
         const user = await User.findOne({email: email});
         if (!user) {
-            return res.status(404).json({Error: "user not found"});
+            return res.status(404).json({error: "user not found"});
         }
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) {
-            return res.status(401).json({Error: "invalid password"});
+            return res.status(401).json({error: "invalid password"});
         }
         const token = jwt.sign(
             {userId: user._id}, process.env.JWT_SECRET, {expiresIn: "14d"});
@@ -82,6 +84,6 @@ exports.login = async (req, res) => {
         });
     } catch (err) {
         console.error(`${err}`);
-        res.status(500).json({Error: err.message});
+        res.status(500).json({error: err.message});
     }
 }

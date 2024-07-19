@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+  --neon-blue: #00ffff;
+  --neon-pink: #ff00ff;
+  --neon-purple: #8a2be2;
+  --bg-color: #121212;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+
+.container {
+  background: linear-gradient(45deg, rgba(138, 43, 226, 0.2), rgba(0, 255, 255, 0.2));
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+  padding: 40px;
+  width: 300px;
+  text-align: center;
+  animation: glow 3s infinite alternate, float 4s ease-in-out infinite;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+h1 {
+  color: var(--neon-blue);
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-shadow: 0 0 10px var(--neon-blue);
+}
+
+p {
+  color: var(--neon-pink);
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+#logoutButton {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--neon-purple);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#logoutButton:hover {
+  background-color: var(--neon-blue);
+  box-shadow: 0 0 15px var(--neon-blue);
+}
+
+@media (max-width: 400px) {
+  .container {
+    width: 90%;
+    padding: 20px;
+  }
+}
