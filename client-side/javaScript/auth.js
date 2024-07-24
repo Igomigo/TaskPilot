@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!response.ok) {
                     throw new Error("Network response was not ok");
                 }
-    
+
                 const result = await response.json();
     
                 if (result.status) {
