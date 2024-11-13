@@ -1,11 +1,14 @@
 import React from 'react'
 import './App.css'
+import { Outlet } from 'react-router-dom';
 
 const App = () => {
   return (
-    <div className='font-semibold m-5'>
-      Main App
-    </div>
+    <>
+      <main>
+        <Outlet></Outlet>
+      </main>
+    </>
   )
 }
 
