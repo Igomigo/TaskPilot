@@ -1,0 +1,41 @@
+{
+  "name": "taskpilot",
+  "version": "1.0.0",
+  "description": "TaskPilot is a robust and intuitive task management application, inspired by popular tools like Trello. This app allows teams and individuals to organize tasks, collaborate effectively, and manage projects with ease.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Igomigo/TaskPilot.git"
+  },
+  "keywords": [
+    "Backend",
+    "API"
+  ],
+  "author": "Igomigo Fatai Victor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Igomigo/TaskPilot/issues"
+  },
+  "homepage": "https://github.com/Igomigo/TaskPilot#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bull": "^4.14.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.4",
+    "nodemailer": "^6.9.14",
+    "redis": "^4.6.14",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.4"
+  }
+}
