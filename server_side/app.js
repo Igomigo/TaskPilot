@@ -7,15 +7,15 @@ const cors = require("cors");
 const cookie_parser = require("cookie-parser");
 const dotenv = require("dotenv").config();
 
-const dbConnect = require("./server_side/config/mongodbClient");
-const authRoute = require("./server_side/routes/authRoute");
+const dbConnect = require("./config/mongodbClient");
+const authRoute = require("./routes/authRoute");
 const authWare = require("./middlewares/authWare");
-const userRoute = require("./server_side/routes/userRoute");
-const boardRoute = require("./server_side/routes/boardRoute");
-const listRoute = require("./server_side/routes/listRoute");
-const cardRoute = require("./server_side/routes/cardRoute");
-const commentRoute = require("./server_side/routes/commentRoute");
-const logRoute = require("./server_side/routes/activityLogRoutes");
+const userRoute = require("./routes/userRoute");
+const boardRoute = require("./routes/boardRoute");
+const listRoute = require("./routes/listRoute");
+const cardRoute = require("./routes/cardRoute");
+const commentRoute = require("./routes/commentRoute");
+const logRoute = require("./routes/activityLogRoutes");
 
 // Initialize the express app
 const app = express();
