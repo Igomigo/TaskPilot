@@ -1,10 +1,10 @@
 // Contains controllers related to list management
 
-const List = require("../../models/list");
-const Board = require("../../models/board");
-const Card = require("../../models/card");
-const Comment = require("../../models/comment");
-const ActivityLog = require("../../models/activityLog");
+const List = require("../models/list");
+const Board = require("../models/board");
+const Card = require("../models/card");
+const Comment = require("../models/comment");
+const ActivityLog = require("../models/activityLog");
 
 exports.createList = async (req, res) => {
     // Creates a new list within a board

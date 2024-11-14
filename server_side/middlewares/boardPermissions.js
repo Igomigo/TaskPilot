@@ -1,5 +1,5 @@
 // Middlewares that inject strict permission measures on the board
-const Board = require("../../models/board");
+const Board = require("../models/board");
 
 exports.permitUser = async (req, res, next) => {
     // checks if a user is permitted to access a board

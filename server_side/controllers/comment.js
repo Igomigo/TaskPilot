@@ -1,9 +1,9 @@
 // Comment management
 
-const Comment = require("../../models/comment");
-const Card = require("../../models/card");
-const List = require("../../models/list");
-const ActivityLog = require("../../models/activityLog");
+const Comment = require("../models/comment");
+const Card = require("../models/card");
+const List = require("../models/list");
+const ActivityLog = require("../models/activityLog");
 
 exports.createComment = async (req, res) => {
     // Create a new comment

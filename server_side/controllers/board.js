@@ -2,12 +2,12 @@
  * Contains controllers related to board management
  */
 
-const User = require("../../models/user");
-const Board = require("../../models/board");
-const List = require("../../models/list");
-const Card = require("../../models/card");
-const Comment = require("../../models/comment");
-const ActivityLog = require("../../models/activityLog");
+const User = require("../models/user");
+const Board = require("../models/board");
+const List = require("../models/list");
+const Card = require("../models/card");
+const Comment = require("../models/comment");
+const ActivityLog = require("../models/activityLog");
 
 exports.createBoard = async (req, res) => {
     // Creates a new board

@@ -1,6 +1,6 @@
 // User management
 
-const User = require("../../models/user");
+const User = require("../models/user");
 
 exports.getUser = async (req, res) => {
     // Returns the user data

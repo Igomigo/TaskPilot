@@ -1,7 +1,7 @@
 // Root file to initialize the server
 const express = require("express");
-const http = require("node:http");
-const socket = require("socket.io");
+//const http = require("node:http");
+//const socket = require("socket.io");
 const morgan = require("morgan");
 const cors = require("cors");
 const cookie_parser = require("cookie-parser");
@@ -19,8 +19,8 @@ const logRoute = require("./routes/activityLogRoutes");
 
 // Initialize the express app
 const app = express();
-const server = http.createServer(app);
-const io = socket(server)
+//const server = http.createServer(app);
+//const io = socket(server)
 
 // Initialize the database connection
 dbConnect();
@@ -46,11 +46,11 @@ app.get("/ping", authWare, (req, res) => {
     console.log("Pong");
 });
 
-require("./utils/socketHandlers")(io);
+//require("./utils/socketHandlers")(io);
 
-app.set("socketio", io);
+//app.set("socketio", io);
 
 // run the server
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log("Server is listening on port:", PORT);
 });
