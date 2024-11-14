@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from "axios";
+import Loading from '../components/loading';
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [credentials, setCredentials] = useState({
         username: "",
         email: "",
@@ -19,11 +23,32 @@ const RegisterPage = () => {
         });
     }
 
-    const handleOnSubmit = (e) => {
+    const handleOnSubmit = async (e) => {
         e.preventDefault();
-        console.log(credentials);
-        toast.success("Submit button clicked");
-        console.log("")
+
+        const url = `${import.meta.env.VITE_BACKEND_URL}/auth/register`;
+        
+        try {
+            setLoading(true);
+            const response = await axios.post(url, credentials);
+            if (response?.data?.status === "success") {
+                console.log(response);
+                toast.success(response?.data?.message);
+                setCredentials({
+                    username: "",
+                    email: "",
+                    password: ""
+                });
+                setLoading(false);
+                navigate("/login");
+            }
+
+        } catch (error) {
+            setLoading(false);
+            console.log("Error Block:", error?.response);
+            toast.error(error?.response?.data?.error || "An unexpected error occurred");
+        }
+    
     }
 
     return (
@@ -42,13 +67,13 @@ const RegisterPage = () => {
                         Name
                         </label>
                         <input
-                        id="username"
-                        type="text"
-                        name="username"
-                        placeholder="Enter your username"
-                        required
-                        onChange={handleOnChange}
-                        className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
+                            id="username"
+                            type="text"
+                            name="username"
+                            placeholder="Enter your username"
+                            required
+                            onChange={handleOnChange}
+                            className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
                         />
                     </div>
                     <div className="space-y-2">
@@ -56,13 +81,13 @@ const RegisterPage = () => {
                         Email
                         </label>
                         <input
-                        id="email"
-                        type="email"
-                        name='email'
-                        placeholder="Enter your email"
-                        required
-                        onChange={handleOnChange}
-                        className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
+                            type="email"
+                            id="email"
+                            name='email'
+                            placeholder="Enter your email"
+                            required
+                            onChange={handleOnChange}
+                            className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
                         />
                     </div>
                     <div className="space-y-2">
@@ -70,21 +95,22 @@ const RegisterPage = () => {
                         Password
                         </label>
                         <input
-                        id="password"
-                        type="password"
-                        name='password'
-                        placeholder="Enter your password"
-                        required
-                        onChange={handleOnChange}
-                        className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
+                            id="password"
+                            type="password"
+                            name='password'
+                            placeholder="Enter your password"
+                            required
+                            onChange={handleOnChange}
+                            className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
                         />
                     </div>
                     <button
-                        onClick={handleOnSubmit}
                         type="submit"
                         className="w-full px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green"
                     >
-                        Register
+                        {
+                            loading ? <Loading /> : "Register"
+                        }
                     </button>
                     <div className='text-sm text-center'>
                         <span className='text-gray-400'>Already have an account? </span>
