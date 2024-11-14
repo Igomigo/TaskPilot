@@ -31,7 +31,7 @@ const RegisterPage = () => {
         try {
             setLoading(true);
             const response = await axios.post(url, credentials);
-            if (response?.data?.status === "success") {
+            if (response?.data?.status) {
                 console.log(response);
                 toast.success(response?.data?.message);
                 setCredentials({

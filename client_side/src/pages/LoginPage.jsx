@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Loading from '../components/loading';
+import axios from 'axios';
 
 const LoginPage = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [credentials, setCredentials] = useState({
         email: "",
         password: ""
@@ -18,11 +22,31 @@ const LoginPage = () => {
         });
     }
 
-    const handleOnSubmit = (e) => {
+    const handleOnSubmit = async (e) => {
         e.preventDefault();
-        console.log(credentials);
-        toast.success("Submit button clicked");
-        console.log("")
+
+        const url = `${import.meta.env.VITE_BACKEND_URL}/auth/login`;
+        
+        try {
+            setLoading(true);
+            const response = await axios.post(url, credentials);
+            if (response?.data?.status) {
+                console.log(response);
+                console.log("Token:", response?.data?.token);
+                toast.success(response?.data?.message);
+                setCredentials({
+                    email: "",
+                    password: ""
+                });
+                setLoading(false);
+                navigate("/");
+            }
+
+        } catch (error) {
+            setLoading(false);
+            console.log("Error Block:", error?.response);
+            toast.error(error?.response?.data?.error || "An unexpected error occurred");
+        }
     }
 
     return (
@@ -65,11 +89,12 @@ const LoginPage = () => {
                         />
                     </div>
                     <button
-                        onClick={handleOnSubmit}
                         type="submit"
                         className="w-full px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green"
                     >
-                        Login
+                        {
+                            loading ? <Loading /> : "Login"
+                        }
                     </button>
                     <div className='text-sm text-center'>
                         <span className='text-gray-400'>Don't have an account yet? </span>
