@@ -3,14 +3,19 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios";
 import Loading from '../components/loading';
+import { IoCloseSharp } from "react-icons/io5";
+import uploadFile from '../helpers/UploadFile';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
+    const [uploadedPhoto, setUploadedPhoto] = useState("");
     const [loading, setLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [credentials, setCredentials] = useState({
         username: "",
         email: "",
-        password: ""
+        password: "",
+        profile_pic: ""
     });
 
     const handleOnChange = (e) => {
@@ -37,7 +42,8 @@ const RegisterPage = () => {
                 setCredentials({
                     username: "",
                     email: "",
-                    password: ""
+                    password: "",
+                    profile_pic: ""
                 });
                 setLoading(false);
                 navigate("/login");
@@ -49,6 +55,31 @@ const RegisterPage = () => {
             toast.error(error?.response?.data?.error || "An unexpected error occurred");
         }
     
+    }
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+
+        setIsUploading(true);
+        const upload = await uploadFile(file);
+        setIsUploading(false);
+
+        console.log("Uploaded photo:", upload?.secure_url);
+
+        setCredentials((prev) => {
+            return {
+                ...prev,
+                profile_pic: upload?.secure_url
+            }
+        });
+
+        setUploadedPhoto(file);
+    }
+
+    const handleClearUploadPhoto = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setUploadedPhoto("");
     }
 
     return (
@@ -101,6 +132,37 @@ const RegisterPage = () => {
                             placeholder="Enter your password"
                             required
                             onChange={handleOnChange}
+                            className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label htmlFor="profile_pic" className="block text-sm font-medium text-gray-400">
+                            <div className='w-full text-yellow hover:border border-green rounded h-14 flex gap-1 justify-center items-center px-3 bg-gray-700'>
+                                <p className='text-sm max-w-[300] text-ellipsis line-clamp-1'>
+                                    {
+                                        uploadedPhoto?.name ? uploadedPhoto?.name : !isUploading && "Upload profile photo"
+                                    }
+                                    {
+                                        isUploading && (
+                                            <Loading />
+                                        )
+                                    }
+                                </p>
+                                {
+                                    uploadedPhoto?.name && ( 
+                                        <button onClick={handleClearUploadPhoto} type='button' className='hover:text-red-500 px-1' title='cancel upload'>
+                                            <IoCloseSharp size={20}/>
+                                        </button>
+                                    )
+                                }
+                            </div>
+                        </label>
+                        <input
+                            hidden
+                            id="profile_pic"
+                            type="file"
+                            name='profile_pic'
+                            onChange={handleImageUpload}
                             className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm bg-input-bg text-white placeholder-gray-400 focus:outline-none focus:ring-green focus:border-green"
                         />
                     </div>
