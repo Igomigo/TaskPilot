@@ -15,7 +15,7 @@ async function hashpwd(pwd) {
 exports.register = async (req, res) => {
     // Registers a user to the server
     try {
-        const {username, email, password} = req.body;
+        const {username, email, password, profile_pic} = req.body;
         if (!username) {
             return res.status(400).json({error: "Username missing"});
         }
@@ -25,7 +25,12 @@ exports.register = async (req, res) => {
         if (!password) {
             return res.status(400).json({error: "Password missing"});
         }
-        const exists = await User.findOne({email: email});
+        const exists = await User.findOne({
+            $or: [
+                {email: email},
+                {username: username}
+            ]
+        });
         if (exists) {
             return res.status(409).json({error: "User already exists"});
         }
@@ -34,7 +39,8 @@ exports.register = async (req, res) => {
         const user = new User({
             username: username,
             email: email,
-            password: hashedpwd
+            password: hashedpwd,
+            profile_pic
         });
         await user.save();
         console.log(`User with email ${email} successfully created`);
@@ -49,7 +55,7 @@ exports.register = async (req, res) => {
         return res.status(201).json({
             status: "success",
             message: "user created successfully",
-            email: email
+            data: user
         });
     } catch (err) {
         console.error(`${err}`);
@@ -80,7 +86,10 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             {userId: user._id}, process.env.JWT_SECRET, {expiresIn: "14d"});
         return res.status(200).json({
-            token: token
+            status: "success",
+            token: token,
+            data: user,
+            message: "You successfully signed in"
         });
     } catch (err) {
         console.error(`${err}`);
