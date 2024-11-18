@@ -33,13 +33,6 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
                 <Link to={"/"} className={
                     `${pathname === "/" && "bg-input-bg"} hover:bg-slate-600 p-2 text-slate-100 rounded-lg px-4 py-2 flex items-center`
                 }>
-                    <IoHome className='mr-4 text-slate-100' size={22}/>
-                    Home
-                </Link>
-
-                <Link to={"/boards"} className={
-                    `${pathname === "/boards" && "bg-input-bg"} hover:bg-slate-600 p-2 text-slate-100 rounded-lg px-4 py-2 flex items-center`
-                }>
                     <MdSpaceDashboard className='mr-4 text-slate-100' size={22}/>
                     Boards
                 </Link>

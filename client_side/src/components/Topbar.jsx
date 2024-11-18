@@ -64,7 +64,7 @@ const Topbar = ({ toggleSidebar }) => {
                     {
                         showUserPopup && (
                             <div className='border border-slate-700 px-1 absolute right-0 mt-2 w-40 py-1 z-10 bg-form-bg shadow-lg rounded-md'>
-                                <Link to={"/profile/igomigo fatai"} className='flex w-full rounded-md items-center px-2 py-2 group hover:bg-input-bg hover:text-white text-slate-300 text-sm'>
+                                <Link to={"profile/igomigo fatai"} className='flex w-full rounded-md items-center px-2 py-2 group hover:bg-input-bg hover:text-white text-slate-300 text-sm'>
                                     <FaUser size={13} className='text-slate-300 group-hover:text-white mr-2'/>
                                     <span className='text-ellipsis line-clamp-1'>Igomigo fatai Victor</span>
                                 </Link>

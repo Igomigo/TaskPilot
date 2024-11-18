@@ -1,9 +1,10 @@
 import React from 'react'
 import './App.css'
-import { Outlet } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import { Outlet } from 'react-router-dom';
 
 const App = () => {
+
   return (
     <>
       <Toaster />
