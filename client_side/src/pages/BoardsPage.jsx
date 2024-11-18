@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
-import MainContent from '../components/MainContent';
+import BoardsContent from '../components/BoardsContent';
 
-const HomePage = () => {
+const BoardsPage = () => {
   const [showSidebar, setShowSidebar] = useState(false);
 
   // Toggle the sidebar state directly
@@ -20,10 +20,10 @@ const HomePage = () => {
         {/** Top bar */}
         <Topbar toggleSidebar={toggleSidebar} />
         {/** Page Content */}
-        <MainContent />
+        <BoardsContent />
       </div>
     </div>
   )
 }
 
-export default HomePage;
+export default BoardsPage;
