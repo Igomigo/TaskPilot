@@ -49,9 +49,9 @@ const Topbar = ({ toggleSidebar }) => {
                 </div>
             </div>
             <div className='flex ml-4 space-x-4 justify-center items-center'>
-                <button className=''>
+                <Link to={"notifications"} className=''>
                     <IoNotifications title='notification' className='text-slate-300 hover:text-white' size={22}/>
-                </button>
+                </Link>
                 <div onClick={toggleArowFunction} ref={userPopupRef} className='relative'>
                     <button className='flex rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-slate-300 justify-center items-center space-x-2'>
                         <img src={""} className='w-8 h-8 rounded-full' />

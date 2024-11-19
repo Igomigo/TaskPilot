@@ -3,7 +3,7 @@ import React from 'react'
 const BoardsPage = () => {
   return (
     <div>
-      Displays all boards 
+      Displays all boards
     </div>
   )
 }

@@ -7,6 +7,7 @@ import BoardPage from "../pages/BoardPage";
 import ProfilePage from "../pages/ProfilePage";
 import SettingsPage from "../pages/SettingsPage";
 import Layout from "../layout/Layout";
+import NotificationsPage from "../pages/NotificationsPage";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -17,7 +18,7 @@ const router = createBrowserRouter([{
             element: <Layout />,
             children: [
                 {
-                    path: "boards",
+                    path: "",
                     element: <BoardsPage />,
                 },
                 {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([{
                 {
                     path: "settings",
                     element: <SettingsPage />
+                },
+                {
+                    path: "notifications",
+                    element: <NotificationsPage />
                 }
             ]
         },
