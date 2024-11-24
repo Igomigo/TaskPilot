@@ -5,6 +5,7 @@ import { IoHome } from "react-icons/io5";
 import { MdSpaceDashboard } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
 import { IoSettingsSharp } from "react-icons/io5";
+import { RxActivityLog } from "react-icons/rx";
 
 const Sidebar = ({ showSidebar, toggleSidebar }) => {
     const { pathname } = useLocation();
@@ -30,7 +31,7 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
             </div>
             {/** Navigation links */}
             <nav className='flex-1 space-y-1 px-2 py-5'>
-                <Link to={"/"} className={
+                <Link to={"/"} onClick={toggleSidebar} className={
                     `${pathname === "/" && "bg-input-bg"} hover:bg-slate-600 p-2 text-slate-100 rounded-lg px-4 py-2 flex items-center`
                 }>
                     <MdSpaceDashboard className='mr-4 text-slate-100' size={22}/>
@@ -46,15 +47,22 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
                 {/** List of last 4 boards */}
                 <div className='ml-7 flex flex-col'>
                     {
-                        boards.length > 0 ? boards.map((board) => {
-                            return <Link key={board.id} to={`/boards/${board.id}`} className='mb-1 px-2 py-1 rounded-lg hover:bg-input-bg'>
-                                <p className='text-sm text-gray-400 text-ellipsis line-clamp-1 hover:text-white'>{board.name}</p>
+                        boards?.length > 0 ? boards?.map((board) => {
+                            return <Link key={board?.id} onClick={toggleSidebar} to={`/boards/${board?.id}`} className='group mb-1 px-2 py-1 rounded-lg hover:bg-input-bg'>
+                                <p className='text-sm text-gray-400 text-ellipsis line-clamp-1 group-hover:text-white'>{board?.name}</p>
                             </Link>
                         }) : <p className='text-sm text-gray-500'>None yet</p>
                     }
                 </div>
 
-                <Link to={"/settings"} className={
+                <Link to={"/activity-log"} onClick={toggleSidebar} className={
+                    `${pathname === "/activity-log" && "bg-input-bg"} hover:bg-slate-600 p-2 text-slate-100 rounded-lg px-4 py-2 flex items-center`
+                }>
+                    <RxActivityLog className='mr-4 text-slate-100' size={20}/>
+                    Activity Log
+                </Link>
+
+                <Link to={"/settings"} onClick={toggleSidebar} className={
                     `${pathname === "/settings" && "bg-input-bg"} hover:bg-slate-600 p-2 text-slate-100 rounded-lg px-4 py-2 flex items-center`
                 }>
                     <IoSettingsSharp className='mr-4 text-slate-100' size={22}/>

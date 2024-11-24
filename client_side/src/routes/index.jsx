@@ -8,6 +8,7 @@ import ProfilePage from "../pages/ProfilePage";
 import SettingsPage from "../pages/SettingsPage";
 import Layout from "../layout/Layout";
 import NotificationsPage from "../pages/NotificationsPage";
+import ActivityLogPage from "../pages/ActivityLogPage";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -36,6 +37,10 @@ const router = createBrowserRouter([{
                 {
                     path: "notifications",
                     element: <NotificationsPage />
+                },
+                {
+                    path: "activity-log",
+                    element: <ActivityLogPage />
                 }
             ]
         },
