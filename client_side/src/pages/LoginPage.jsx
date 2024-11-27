@@ -3,9 +3,15 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import Loading from '../components/loading';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setToken, setUser } from '../redux/userSlice';
 
 const LoginPage = () => {
+    // Hooks
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    // State Management
     const [loading, setLoading] = useState(false);
     const [credentials, setCredentials] = useState({
         email: "",
@@ -30,9 +36,15 @@ const LoginPage = () => {
         try {
             setLoading(true);
             const response = await axios.post(url, credentials);
+
             if (response?.data?.status) {
-                console.log(response);
-                console.log("Token:", response?.data?.token);
+                // Store the token in the local storage
+                localStorage.setItem("token", response?.data?.token);
+                
+                // Dispatch the user data and token to the redux store
+                dispatch(setUser(response?.data?.data));
+                dispatch(setToken(response?.data?.token));
+
                 toast.success(response?.data?.message);
                 setCredentials({
                     email: "",
@@ -44,7 +56,7 @@ const LoginPage = () => {
 
         } catch (error) {
             setLoading(false);
-            console.log("Error Block:", error?.response);
+            console.log("Error Block:", error);
             toast.error(error?.response?.data?.error || "An unexpected error occurred");
         }
     }

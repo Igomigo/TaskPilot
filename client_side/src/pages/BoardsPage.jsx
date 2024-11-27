@@ -1,9 +1,75 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus } from "react-icons/fa6";
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../redux/userSlice';
+import { formatDistanceToNow } from 'date-fns';
 
 const BoardsPage = () => {
-  const boards = [
+  // Hooks
+  const navigate = useNavigate();
+  const user = useSelector(state => state?.user);
+  const dispatch = useDispatch();
+
+  // State Management
+  const [boards, setBoards] = useState([]);
+
+  useEffect(() => {
+    // Function that retrieves all boards data for the current user
+    const getBoards = async () => {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/b`;
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+      //console.log("Token:", token);
+      
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response?.status === 401) {
+          // Token is invalid or expired, redirect to login
+          localStorage.removeItem("token");
+          dispatch(logout());
+          navigate("/login");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Error retrieving boards");
+        }
+
+        const boardsData = await response.json();
+        console.log("Boards response:", boardsData);
+
+        // Convert the updatedAt time to relative format
+        const transformedBoards = boardsData?.map((board) => ({
+          ...board,
+          updatedAt: formatDistanceToNow(new Date(board.updatedAt), { addSuffix: true })
+        }));
+
+        setBoards(transformedBoards);
+
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    }
+
+    getBoards();
+  }, [navigate, user]);
+  
+  console.log("Boards state:", boards);
+  
+  
+  const Boards = [
     {
       updatedAt: "Updated 2h ago",
       title: "Project 1",

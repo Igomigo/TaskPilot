@@ -51,7 +51,7 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
                             return <Link key={board?.id} onClick={toggleSidebar} to={`/boards/${board?.id}`} className='group mb-1 px-2 py-1 rounded-lg hover:bg-input-bg'>
                                 <p className='text-sm text-gray-400 text-ellipsis line-clamp-1 group-hover:text-white'>{board?.name}</p>
                             </Link>
-                        }) : <p className='text-sm text-gray-500'>None yet</p>
+                        })  : <p className='text-sm text-gray-500'>None yet</p>
                     }
                 </div>
 

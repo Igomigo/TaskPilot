@@ -1,16 +1,71 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../redux/userSlice';
 
 const Layout = () => {
+  // Hooks
+  const user = useSelector(state => state?.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // State Management
   const [showSidebar, setShowSidebar] = useState(false);
+  const [boards, setBoards] = useState([]);
   const sidebarRef = useRef(null);
 
   // Toggle the sidebar state directly
   const toggleSidebar = () => {
     setShowSidebar(prev => !prev);
   }
+
+  // Send request for the user and board data
+  useEffect(() => {
+    // Function that retrieves all boards data for the current user
+    const getBoards = async () => {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/b`;
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+      //console.log("Token:", token);
+      
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response?.status === 401) {
+          // Token is invalid or expired, redirect to login
+          localStorage.removeItem("token");
+          dispatch(logout());
+          navigate("/login");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Error retrieving boards");
+        }
+
+        const boardsData = await response.json();
+        console.log("Boards response:", boardsData);
+        setBoards(boardsData);
+
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    }
+
+    getBoards();
+  }, [navigate, user]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -29,13 +84,13 @@ const Layout = () => {
     <div className='relative flex h-screen bg-bg-color'>
       {/** Side bar */}
       <div ref={sidebarRef}>
-        <Sidebar showSidebar={showSidebar} toggleSidebar={toggleSidebar} />
+        <Sidebar boards={boards} showSidebar={showSidebar} toggleSidebar={toggleSidebar} />
       </div>
       
       {/** Overlay for smaller screens */}
       {showSidebar && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden" 
+          className="fixed inset-0 bg-black bg-opacity-40 z-40 lg:hidden" 
           onClick={() => setShowSidebar(false)}
         ></div>
       )}
@@ -43,7 +98,7 @@ const Layout = () => {
       {/** Main content */}
       <div className='flex flex-1 flex-col overflow-hidden'>
         {/** Top bar */}
-        <Topbar toggleSidebar={toggleSidebar} />
+        <Topbar user={user} toggleSidebar={toggleSidebar} />
         {/** Page Content */}
         <Outlet />
       </div>
