@@ -25,7 +25,12 @@ const BoardSchema = new Schema({
     lists: [{
         type: Schema.Types.ObjectId,
         ref: "List"
-    }]
+    }],
+    status: {
+        type: String,
+        enum: ["In Progress", "Completed"],
+        default: "In Progress"
+    }
 }, {
     timestamps: true
 });
