@@ -56,7 +56,7 @@ exports.getBoards = async (req, res) => {
                 {owner: current_user._id},
                 {members: {$in: [current_user._id]}}
             ]
-        });
+        }).sort({ updatedAt: -1 });
         if (boards.length === 0) {
             console.log("No board found");
             return res.status(404).json({error: "You have not created any board yet"});
