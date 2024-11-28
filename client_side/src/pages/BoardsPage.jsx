@@ -25,6 +25,7 @@ const BoardsPage = () => {
         return;
       }
       //console.log("Token:", token);
+      console.log(user);
       
       try {
         const response = await fetch(url, {
@@ -48,7 +49,7 @@ const BoardsPage = () => {
         }
 
         const boardsData = await response.json();
-        console.log("Boards response:", boardsData);
+        //console.log("Boards Page response:", boardsData);
 
         // Convert the updatedAt time to relative format
         const transformedBoards = boardsData?.map((board) => ({
@@ -69,7 +70,7 @@ const BoardsPage = () => {
   console.log("Boards state:", boards);
   
   
-  const Boards = [
+  /** const Boards = [
     {
       updatedAt: "Updated 2h ago",
       title: "Project 1",
@@ -112,7 +113,7 @@ const BoardsPage = () => {
       status: "Completed",
       _id: 6
     }
-  ]
+  ] */
 
   return (
     <main className='flex-1 overflow-auto p-4'>

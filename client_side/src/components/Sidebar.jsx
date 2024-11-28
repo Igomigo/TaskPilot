@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoCloseSharp } from "react-icons/io5";
 import { Link, useLocation } from 'react-router-dom';
 import { IoHome } from "react-icons/io5";
@@ -7,16 +7,30 @@ import { FaPlus } from "react-icons/fa6";
 import { IoSettingsSharp } from "react-icons/io5";
 import { RxActivityLog } from "react-icons/rx";
 
-const Sidebar = ({ showSidebar, toggleSidebar }) => {
+const Sidebar = ({ showSidebar, toggleSidebar, boards }) => {
+    // Hooks
     const { pathname } = useLocation();
 
-    const boards = [
+    // State Management
+    const [Boards, setBoards] = useState([]);
+
+    // Extract the last 5 boards
+    useEffect(() => {
+        const extractLastFiveBoards = () => {
+            const lastFive = boards.slice(0, 5);
+            setBoards(lastFive);
+        }
+
+        extractLastFiveBoards();
+    }, [boards]);
+
+    /** const Boards = [
         {name: "Software Team plan", id: "1"},
         {name: "Content Team", id: "2"},
         {name: "Team Progress, Marketing", id: "3"},
         {name: "NNPC Engineers plan", id: "4"},
         {name: "Collaborapay Frontend Plan", id: "5"}
-    ]
+    ] */
 
     return (
         <aside className={
@@ -47,9 +61,10 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
                 {/** List of last 4 boards */}
                 <div className='ml-7 flex flex-col'>
                     {
-                        boards?.length > 0 ? boards?.map((board) => {
-                            return <Link key={board?.id} onClick={toggleSidebar} to={`/boards/${board?.id}`} className='group mb-1 px-2 py-1 rounded-lg hover:bg-input-bg'>
-                                <p className='text-sm text-gray-400 text-ellipsis line-clamp-1 group-hover:text-white'>{board?.name}</p>
+                        Boards?.length > 0 ? Boards?.map((board) => {
+                            return <Link key={board?._id} onClick={toggleSidebar} to={`/boards/${board?._id}`} className={
+                                `${pathname === `/boards/${board._id}` && "bg-input-bg"} group mb-1 px-2 py-1 rounded-lg hover:bg-input-bg`}>
+                                <p className={`${pathname === `/boards/${board._id}` && "text-white"} text-sm text-gray-400 text-ellipsis line-clamp-1 group-hover:text-white`}>{board?.title}</p>
                             </Link>
                         })  : <p className='text-sm text-gray-500'>None yet</p>
                     }

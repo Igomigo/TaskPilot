@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     _id: "",
-    name: "",
+    username: "",
     email: "",
     profile_pic: "",
     token: "",
@@ -15,7 +15,7 @@ const initialState = {
     reducers: {
       setUser: (state, action) => {
         state._id = action.payload._id;
-        state.name = action.payload.name;
+        state.username = action.payload.username;
         state.email = action.payload.email;
         state.profile_pic = action.payload.profile_pic;
       },
@@ -24,7 +24,7 @@ const initialState = {
       },
       logout: (state, action) => {
         state._id = "";
-        state.name = "";
+        state.username = "";
         state.email = "";
         state.profile_pic = "";
         state.token = "";

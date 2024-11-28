@@ -4,11 +4,18 @@ import { IoIosSearch } from "react-icons/io";
 import { IoNotifications } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/userSlice';
 
-const Topbar = ({ toggleSidebar }) => {
+const Topbar = ({ toggleSidebar, user }) => {
+    // Hooks
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    // State Management
     const [toggleArrow, setToggleArrow] = useState(true);
     const [showUserPopup, setShowUserPopup] = useState(false);
     const userPopupRef = useRef(null);
@@ -31,6 +38,13 @@ const Topbar = ({ toggleSidebar }) => {
     const toggleArowFunction = () => {
         setToggleArrow(prev => !prev);
         setShowUserPopup(prev => !prev);
+    }
+
+    // Handle logout
+    const logOut = () => {
+        localStorage.removeItem("token");
+        dispatch(logout());
+        navigate("/login");
     }
 
     return (
@@ -64,12 +78,12 @@ const Topbar = ({ toggleSidebar }) => {
                     {
                         showUserPopup && (
                             <div className='border border-slate-700 px-1 absolute right-0 mt-2 w-40 py-1 z-10 bg-form-bg shadow-lg rounded-md'>
-                                <Link to={"profile/igomigo fatai"} className='flex w-full rounded-md items-center px-2 py-2 group hover:bg-input-bg hover:text-white text-slate-300 text-sm'>
+                                <Link to={`profile/${user.username}`} className='flex w-full rounded-md items-center px-2 py-2 group hover:bg-input-bg hover:text-white text-slate-300 text-sm'>
                                     <FaUser size={13} className='text-slate-300 group-hover:text-white mr-2'/>
-                                    <span className='text-ellipsis line-clamp-1'>Igomigo fatai Victor</span>
+                                    <span className='text-ellipsis line-clamp-1'>{user.username}</span>
                                 </Link>
-                                <button className='flex w-full rounded-md items-center px-2 py-2 group hover:bg-input-bg hover:text-white text-slate-300 text-sm'>
-                                    <FiLogOut size={13} className='text-slate-300 group-hover:text-white mr-2'/>
+                                <button onClick={logOut} className='flex w-full rounded-md items-center px-2 py-2 group hover:bg-input-bg hover:text-red-500 text-slate-300 text-sm'>
+                                    <FiLogOut size={13} className='text-slate-300 group-hover:text-red-500 mr-2'/>
                                     Logout
                                 </button>
                             </div>

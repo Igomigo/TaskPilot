@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import Topbar from '../components/Topbar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/userSlice';
+import { logout, setToken, setUser } from '../redux/userSlice';
 
 const Layout = () => {
   // Hooks
@@ -21,7 +21,7 @@ const Layout = () => {
     setShowSidebar(prev => !prev);
   }
 
-  // Send request for the user and board data
+  // Send request for the board data
   useEffect(() => {
     // Function that retrieves all boards data for the current user
     const getBoards = async () => {
@@ -56,7 +56,7 @@ const Layout = () => {
         }
 
         const boardsData = await response.json();
-        console.log("Boards response:", boardsData);
+        //console.log("Layout Boards response:", boardsData);
         setBoards(boardsData);
 
       } catch (error) {
@@ -65,6 +65,55 @@ const Layout = () => {
     }
 
     getBoards();
+  }, [navigate, user]);
+
+  // Send a request for the user data
+  useEffect(() => {
+    const getUserData = async () => {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/u/account`;
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          dispatch(logout());
+          navigate("/login");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("Error retrieving user details");
+        }
+
+        const userData = await response.json();
+
+        //console.log("State Data before:", user);
+
+        // Update the state data on the redux store
+        dispatch(setUser(userData));
+        dispatch(setToken(token));
+
+        //console.log("State Data after:", user);
+
+      } catch (error) {
+        console.log("Error:", error.message);
+      }
+    }
+
+    getUserData();
   }, [navigate, user]);
 
   useEffect(() => {
