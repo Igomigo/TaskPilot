@@ -9,6 +9,7 @@ import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/userSlice';
+import Avatar from './Avatar';
 
 const Topbar = ({ toggleSidebar, user }) => {
     // Hooks
@@ -68,7 +69,7 @@ const Topbar = ({ toggleSidebar, user }) => {
                 </Link>
                 <div onClick={toggleArowFunction} ref={userPopupRef} className='relative'>
                     <button className='flex rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-slate-300 justify-center items-center space-x-2'>
-                        <img src={""} className='w-8 h-8 rounded-full' />
+                        <Avatar username={user?.username} userId={user?._id} width={27} height={27}/>
                         <div className='text-slate-400 hidden lg:block'>
                             {
                                 toggleArrow ? <IoIosArrowDown size={18} /> : <IoIosArrowUp size={18} />

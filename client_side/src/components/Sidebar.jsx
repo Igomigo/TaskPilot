@@ -62,7 +62,7 @@ const Sidebar = ({ showSidebar, toggleSidebar, boards }) => {
                 <div className='ml-7 flex flex-col'>
                     {
                         Boards?.length > 0 ? Boards?.map((board) => {
-                            return <Link key={board?._id} onClick={toggleSidebar} to={`/boards/${board?._id}`} className={
+                            return <Link key={board?._id} title={board?.title} onClick={toggleSidebar} to={`/boards/${board?._id}`} className={
                                 `${pathname === `/boards/${board._id}` && "bg-input-bg"} group mb-1 px-2 py-1 rounded-lg hover:bg-input-bg`}>
                                 <p className={`${pathname === `/boards/${board._id}` && "text-white"} text-sm text-gray-400 text-ellipsis line-clamp-1 group-hover:text-white`}>{board?.title}</p>
                             </Link>
