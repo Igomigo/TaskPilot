@@ -22,7 +22,8 @@ exports.createBoard = async (req, res) => {
         const board = new Board({
             title: title,
             description: description,
-            owner: current_user._id
+            owner: current_user._id,
+            members: current_user._id
         });
         await board.save();
         // Populate the activity log
@@ -36,8 +37,8 @@ exports.createBoard = async (req, res) => {
         });
         await logger.save();
         // emit the event to all connected clients of this board
-        const io = req.app.get("socketio");
-        io.to(board._id).emit("createBoard", board);
+        //const io = req.app.get("socketio");
+        //io.to(board._id).emit("createBoard", board);
         // return a response to the client
         return res.status(201).json(board);
     } catch (err) {
@@ -51,17 +52,15 @@ exports.getBoards = async (req, res) => {
     // Retrieves all boards for the current user
     try {
         const current_user = req.current_user;
+        
         const boards = await Board.find({
             $or: [
                 {owner: current_user._id},
                 {members: {$in: [current_user._id]}}
             ]
-        }).sort({ updatedAt: -1 });
-        if (boards.length === 0) {
-            console.log("No board found");
-            return res.status(404).json({error: "You have not created any board yet"});
-        }
-        res.status(200).json(boards);
+        }).sort({ updatedAt: -1 }).populate("members");
+
+        return res.status(200).json(boards);
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
@@ -125,10 +124,7 @@ exports.updateBoard = async (req, res) => {
         }
         board.updatedAt = Date.now();
         await board.save();
-        // emit the update event to all clients connected
-        const io = req.app.get("socketio");
-        io.to(board._id).emit("updateBoard", board);
-        // return a response to the client
+        // return a response to  the client
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);
@@ -167,10 +163,7 @@ exports.addMember = async (req, res) => {
             createdBy: current_user._id,
             boardId: boardId,
         });
-        await logger.save()
-        // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(board._id).emit("addMember", board);
+        await logger.save();
         // return a response to the client
         return res.status(200).json(board);
     } catch (err) {

@@ -35,7 +35,7 @@ router.put("/update/:id", authWare, board.updateBoard);
  * url: http://localhost:3000/b/addmember/:boardId
  */
 router.post(
-    "/addmember/:boardId", authWare,
+    "/:boardId/add-member", authWare,
     permission.addRemDelPermission, board.addMember
 );
 
@@ -44,7 +44,7 @@ router.post(
  * url: http://localhost:3000/b/:boardId/removemember/:userId
  */
 router.delete(
-    "/:boardId/deletemember/:userId", authWare,
+    "/:boardId/delete-member/:userId", authWare,
     permission.addRemDelPermission, board.removeMember
 );
 

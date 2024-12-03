@@ -6,11 +6,11 @@ const BoardSchema = new Schema({
     title: {
         type: String,
         required: true,
-        maxLength: 50
+        maxLength: 100
     },
     description: {
         type: String,
-        maxLength: 100
+        maxLength: 500
     },
     owner: {
         type: Schema.Types.ObjectId,
