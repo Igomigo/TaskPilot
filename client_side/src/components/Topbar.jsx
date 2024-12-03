@@ -69,7 +69,7 @@ const Topbar = ({ toggleSidebar, user }) => {
                 </Link>
                 <div onClick={toggleArowFunction} ref={userPopupRef} className='relative'>
                     <button className='flex rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-slate-300 justify-center items-center space-x-2'>
-                        <Avatar username={user?.username} userId={user?._id} width={27} height={27}/>
+                        <Avatar imageUrl={user.profile_pic} username={user?.username} userId={user?._id} width={27} height={27}/>
                         <div className='text-slate-400 hidden lg:block'>
                             {
                                 toggleArrow ? <IoIosArrowDown size={18} /> : <IoIosArrowUp size={18} />

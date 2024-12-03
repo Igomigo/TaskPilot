@@ -12,14 +12,16 @@ const Avatar = ({ imageUrl, userId, username, width, height }) => {
     }
 
     const bgColors = [
-        'bg-slate-400',
-        'bg-teal-300',
+        "bg-indigo-500",
+        "bg-orange-400",
         'bg-red-300',
-        'bg-green-300',
-        'bg-yellow-300',
+        'bg-teal-300',
+        "bg-sky-300",
+        'bg-slate-400',
         'bg-gray-300',
         "bg-cyan-300",
-        "bg-sky-300",
+        "bg-purple-500",
+        'bg-pink-500',
         "bg-blue-300"
     ]
 
@@ -31,24 +33,26 @@ const Avatar = ({ imageUrl, userId, username, width, height }) => {
     const colorIndex = Math.abs(hashCode(userId || name || "default")) % bgColors.length;
     const bgColor = bgColors[colorIndex];
 
+    const fontSize = Math.max(width * 0.4, 16);
+
     return (
-        <div className={`rounded-full font-bold relative`} style={{width: width+"px", height: height+"px"}}>
+        <div className={`flex justify-center overflow-hidden items-center rounded-full font-bold relative`} style={{width: width+"px", height: height+"px"}}>
             {
                 imageUrl ? (
                     <img
                         src={`${imageUrl}`}
-                        width={width}
-                        height={height}
-                        className='overflow-hidden rounded-full'
+                        alt={username || "Avatar"}
+                        className='w-full h-full object-cover'
                     />
                 ) : (
                     username ? (
-                        <div className={`overflow-hidden flex justify-center items-center rounded-full text-lg ${bgColor}`} style={{width: width+"px", height: height+"px"}}>
+                        <div style={{fontSize: fontSize+"px", width: width+"px", height: height+"px"}} className={`overflow-hidden text-white flex justify-center items-center rounded-full text-lg ${bgColor}`}>
                             {name}
                         </div>
                     ) : (
                         <FaRegUser
-                            size={width}
+                            size={width * 0.6}
+                            className='text-gray-300'
                         />
                     )
                 )

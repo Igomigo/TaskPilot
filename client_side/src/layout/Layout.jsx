@@ -65,7 +65,7 @@ const Layout = () => {
     }
 
     getBoards();
-  }, [navigate, user]);
+  }, [navigate, user, dispatch]);
 
   // Send a request for the user data
   useEffect(() => {

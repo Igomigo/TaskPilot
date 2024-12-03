@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../redux/userSlice';
 import { formatDistanceToNow } from 'date-fns';
+import Avatar from '../components/Avatar';
 
 const BoardsPage = () => {
   // Hooks
@@ -13,6 +14,7 @@ const BoardsPage = () => {
 
   // State Management
   const [boards, setBoards] = useState([]);
+  const [members, setMembers] = useState([]);
 
   useEffect(() => {
     // Function that retrieves all boards data for the current user
@@ -25,7 +27,7 @@ const BoardsPage = () => {
         return;
       }
       //console.log("Token:", token);
-      console.log(user);
+      //console.log(user);
       
       try {
         const response = await fetch(url, {
@@ -43,6 +45,8 @@ const BoardsPage = () => {
           navigate("/login");
           return;
         }
+
+        console.log("Response:", response);
 
         if (!response.ok) {
           throw new Error("Error retrieving boards");
@@ -65,9 +69,9 @@ const BoardsPage = () => {
     }
 
     getBoards();
-  }, [navigate, user]);
+  }, [navigate, user, dispatch]);
   
-  console.log("Boards state:", boards);
+  //console.log("Boards state:", boards);
   
   
   /** const Boards = [
@@ -138,7 +142,34 @@ const BoardsPage = () => {
                   <span className='text-sm text-gray-500'>{board?.updatedAt}</span>
                 </div>
                 <h3 className='text-lg mb-2 font-semibold text-white text-ellipsis line-clamp-1'>{board?.title}</h3>
-                <p className='text-gray-300 mb-4 text-sm'>{board?.description}</p>
+                <p className='text-gray-300 mb-5 text-sm'>{board?.description}</p>
+                <div className='flex justify-between items-center'>
+                  {
+                    board?.members?.length > 0 ? (
+                      <div className='flex'>
+                        <div className='flex -space-x-2'>
+                          {
+                            board?.members?.slice(0, 3).map((member) => (
+                                <Avatar key={member._id} username={member.username} imageUrl={member.profile_pic} width={30} height={30} />
+                            ))
+                          }
+                        </div>
+                        {
+                          board?.members?.length > 3 && (
+                            <span className='mt-3 text-sm text-white'>...</span>
+                          )
+                        }
+                      </div>
+                    ) : ("")
+                  }
+                  {
+                    board?.lists?.length <= 1 ? (
+                      <span className='text-gray-500 font-semibold'>{board.lists.length} Task</span>
+                    ) : (
+                      <span className='text-gray-500 font-semibold'>{board.lists.length} Tasks</span>
+                    )
+                  }
+                </div>
                 <div className='absolute inset-x-0 bottom-0 h-1 group-hover:bg-slate-400 bg-slate-500 transition-all ease-in-out duration-300 group-hover:h-1.5'></div>
               </Link>
             )
