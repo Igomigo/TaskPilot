@@ -25,6 +25,7 @@ const ProfilePage = () => {
 
     // State Management
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [credentials, setCredentials] = useState({
         username: user?.username,
         email: user?.email,
@@ -43,6 +44,7 @@ const ProfilePage = () => {
 
     // Handle Image Change
     const handleImageChange = async (e) => {
+        setUploading(true);
         const file = e.target.files[0];
 
         const upload = await uploadFile(file);
@@ -51,6 +53,8 @@ const ProfilePage = () => {
             ...prev,
             profile_pic: upload?.secure_url
         }));
+
+        setUploading(false);
     }
 
     // Handle form Submission
@@ -74,6 +78,13 @@ const ProfilePage = () => {
                 localStorage.removeItem("token");
                 dispatch(logout());
                 navigate("/login");
+                return;
+            }
+
+            if (response.status === 409) {
+                toast.error("User with this email already exists, kindly enter a unique email");
+                //console.log("User with this email already exists, kindly enter a unique email");
+                return;
             }
 
             if (!response.ok) {
@@ -109,14 +120,26 @@ const ProfilePage = () => {
                         <div className="flex flex-col items-center mb-6">
                             <div className="relative">
                                 <div className="rounded-full overflow-hidden">
-                                    <Avatar imageUrl={credentials?.profile_pic} width={200} height={200} username={params.username} />
+                                    {
+                                        uploading ? (
+                                            <div className='bg-gray-900 flex items-center justify-center w-44 h-44'>
+                                                <Loading />
+                                            </div>
+                                        ) : (
+                                            <Avatar imageUrl={credentials?.profile_pic} width={200} height={200} username={params.username} />
+                                        )
+                                    }
                                 </div>
-                                <label
-                                    htmlFor="profile_pic"
-                                    className="absolute bottom-2 right-1 bg-purple-600 text-white rounded-full p-2 cursor-pointer hover:bg-purple-700 transition-colors"
-                                >
-                                    <FaImage className="w-6 h-6" />
-                                </label>
+                                {
+                                    !uploading && (
+                                        <label
+                                            htmlFor="profile_pic"
+                                            className="absolute bottom-2 right-1 bg-purple-600 text-white rounded-full p-2 cursor-pointer hover:bg-purple-700 transition-colors"
+                                        >
+                                            <FaImage className="w-6 h-6" />
+                                        </label>
+                                    )
+                                }
                                 <input type="file" onChange={handleImageChange} name="profile_pic" id="profile_pic" className="sr-only" />
                             </div>
                         </div>
@@ -148,14 +171,16 @@ const ProfilePage = () => {
                                 />
                             </div>
                         </div>
-                        <button
-                            type="submit"
-                            className="font-semibold w-full text-center bg-emerald-600 rounded-md hover:bg-emerald-700 text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
-                        >
-                            {
-                                loading ? (<Loading />) : "Save Changes"
-                            }
-                        </button>
+                        <div className='flex justify-center items-center'>
+                            <button
+                                type="submit"
+                                className="font-semibold bg-emerald-600 rounded-md hover:bg-emerald-700 text-white py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+                            >
+                                {
+                                    loading ? (<Loading />) : "Save Changes"
+                                }
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

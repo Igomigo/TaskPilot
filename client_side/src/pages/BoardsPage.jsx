@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../redux/userSlice';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '../components/Avatar';
+import CreateBoard from '../components/CreateBoard';
 
 const BoardsPage = () => {
   // Hooks
@@ -15,6 +16,17 @@ const BoardsPage = () => {
   // State Management
   const [boards, setBoards] = useState([]);
   const [members, setMembers] = useState([]);
+  const [createBoard, setCreateBoard] = useState(false);
+
+  // Update the boards from the create board component
+  const updateBoardsFunction = (newBoard) => {
+    setBoards(prev => (
+      [
+        newBoard,
+        ...prev
+      ]
+    ));
+  }
 
   useEffect(() => {
     // Function that retrieves all boards data for the current user
@@ -46,7 +58,7 @@ const BoardsPage = () => {
           return;
         }
 
-        console.log("Response:", response);
+        //console.log("Response:", response);
 
         if (!response.ok) {
           throw new Error("Error retrieving boards");
@@ -72,6 +84,11 @@ const BoardsPage = () => {
   }, [navigate, user, dispatch]);
   
   //console.log("Boards state:", boards);
+
+  // Handle onClose event that closes the create group modal
+  const handleOnclose = () => {
+    setCreateBoard(false);
+  }
   
   
   /** const Boards = [
@@ -120,18 +137,23 @@ const BoardsPage = () => {
   ] */
 
   return (
-    <main className='flex-1 overflow-auto p-4'>
-      <div className='mb-6 flex justify-between items-center'>
+    <main className='flex-1 relative overflow-auto p-4'>
+      <div className='mb-6 sticky z-30 bg-gray-900/70 backdrop-blur-md p-3 w-full rounded-md top-0 flex justify-between items-center'>
         <h1 className='text-2xl font-semibold text-slate-100'>Boards</h1>
-        <button className='lg:hidden flex rounded-md px-4 py-2 text-sm bg-blue-700 hover:bg-blue-800 font-medium items-center focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2 p-3 text-slate-100 hover:text-white'>
+        <button onClick={() => setCreateBoard(true)} className='lg:hidden flex rounded-md px-4 py-2 text-sm bg-blue-700 hover:bg-blue-800 font-medium items-center focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2 p-3 text-slate-100 hover:text-white'>
           <FaPlus className='mr-2' size={20} />
           New Board
         </button>
-        <button className='hidden lg:flex rounded-md px-4 py-2 text-sm bg-blue-700 hover:bg-blue-800 font-medium items-center focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2 p-3 text-slate-100 hover:text-white'>
+        <button onClick={() => setCreateBoard(true)} className='hidden lg:flex rounded-md px-4 py-2 text-sm bg-blue-700 hover:bg-blue-800 font-medium items-center focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2 p-3 text-slate-100 hover:text-white'>
           <FaPlus className='mr-2' size={20} />
           Create New Board
         </button>
       </div>
+      {
+        createBoard && (
+          <CreateBoard updateBoards={updateBoardsFunction} user={user} onClose={handleOnclose} />
+        )
+      }
       {/** show all boards */}
       <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3'>
         {
@@ -164,9 +186,9 @@ const BoardsPage = () => {
                   }
                   {
                     board?.lists?.length <= 1 ? (
-                      <span className='text-gray-500 font-semibold'>{board.lists.length} Task</span>
+                      <span className='text-gray-500 font-semibold'>{board.lists.length} List</span>
                     ) : (
-                      <span className='text-gray-500 font-semibold'>{board.lists.length} Tasks</span>
+                      <span className='text-gray-500 font-semibold'>{board.lists.length} Lists</span>
                     )
                   }
                 </div>
