@@ -36,11 +36,16 @@ exports.createBoard = async (req, res) => {
             boardId: board._id,
         });
         await logger.save();
-        // emit the event to all connected clients of this board
-        //const io = req.app.get("socketio");
-        //io.to(board._id).emit("createBoard", board);
-        // return a response to the client
-        return res.status(201).json(board);
+
+        // Retrive the created group and populate the members field
+        const boardData = await Board.findById(board._id)
+        .populate("members");
+
+        //console.log(boardData);
+
+        // Return a response to the client
+        return res.status(201).json(boardData);
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
