@@ -137,8 +137,8 @@ const BoardsPage = () => {
   ] */
 
   return (
-    <main className='flex-1 relative overflow-auto p-4'>
-      <div className='mb-6 sticky z-30 bg-gray-900/70 backdrop-blur-md p-3 w-full rounded-md top-0 flex justify-between items-center'>
+    <main className='flex-1 relative mb-5 overflow-auto py-2 px-4'>
+      <div className='mb-2 sticky z-30 bg-gray-900/70 backdrop-blur-md p-3 w-full rounded-md top-0 flex justify-between items-center'>
         <h1 className='text-2xl font-semibold text-slate-100'>Boards</h1>
         <button onClick={() => setCreateBoard(true)} className='lg:hidden flex rounded-md px-4 py-2 text-sm bg-blue-700 hover:bg-blue-800 font-medium items-center focus:outline-none focus:ring-2 focus:ring-slate-600 focus:ring-offset-2 p-3 text-slate-100 hover:text-white'>
           <FaPlus className='mr-2' size={20} />
