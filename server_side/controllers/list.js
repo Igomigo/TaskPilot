@@ -41,9 +41,6 @@ exports.createList = async (req, res) => {
             listId: list._id
         });
         await logger.save();
-        // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(list.board).emit("createList", savedList);
         // return a response to the client
         return res.status(201).json(savedList);
     } catch (err) {
@@ -55,14 +52,26 @@ exports.createList = async (req, res) => {
 }
 
 exports.getLists = async (req, res) => {
-    // Retrieves a particular list within a board
+    // Retrieves all lists within a board
+    const boardId = req.params.boardId;
+    const current_user = req.current_user;
+
     try {
-        const id = req.params.id;
-        const list = await List.findById(id);
-        if (!list) {
-            return res.status(400).json({error: "Not found"});
+        const list = await List.findOne({boards: boardId})
+        .populate("board")
+        .populate("cards");
+
+        // Check if the user is authorized to see this list
+        if (!list.board.members.includes(current_user._id)) {
+            return res.status(403).json({error: "You're not a member of this board"});
         }
+
+        if (!list) {
+            return res.status(200).json([]);
+        }
+
         return res.status(200).json(list);
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({

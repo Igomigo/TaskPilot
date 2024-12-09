@@ -12,10 +12,10 @@ const router = express.Router();
 router.post("/:boardId/list", authWare, list.createList);
 
 /**
- * GET request to retrieve a list within a board
- * url: http://localhost:3000/b/lists
+ * GET request to retrieve all list within a board
+ * url: http://localhost:3000/b/:boardId/lists
  */
-router.get("/lists", authWare, list.getLists);
+router.get("/:boardId/lists", authWare, list.getLists);
 
 /**
  * PUT request to update a particular list data
