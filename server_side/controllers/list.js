@@ -57,14 +57,14 @@ exports.getLists = async (req, res) => {
     const current_user = req.current_user;
 
     try {
-        const list = await List.findOne({boards: boardId})
+        const list = await List.findOne({board: boardId})
         .populate("board")
         .populate("cards");
 
         // Check if the user is authorized to see this list
-        if (!list.board.members.includes(current_user._id)) {
-            return res.status(403).json({error: "You're not a member of this board"});
-        }
+        //if (!list?.board?.members?.includes(current_user._id)) {
+            //return res.status(403).json({error: "You're not a member of this board"});
+        //}
 
         if (!list) {
             return res.status(200).json([]);
@@ -73,7 +73,7 @@ exports.getLists = async (req, res) => {
         return res.status(200).json(list);
 
     } catch (err) {
-        console.log(`${err}`);
+        console.log(err);
         return res.status(500).json({
             error: `An error occured internally: ${err.message}`
         });

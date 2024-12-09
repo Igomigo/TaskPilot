@@ -75,17 +75,30 @@ exports.getBoards = async (req, res) => {
 
 exports.getBoardById = async (req, res) => {
     // Retrieves a single board data based on the id
+    const boardId = req.params.boardId;
+    const current_user = req.current_user;
+
     try {
-        const boardId = req.params.boardId;
         const board = await Board.findById(boardId).populate({
             path: "lists",
             populate: {
                 path: "cards"
             }
         }).exec();
+
+        // Check if board exists
         if (!board) {
             return res.status(404).json({});
         }
+
+        // // Check if the current user is authorized to see rthis board
+        // if (!board.members.includes(current_user._id)) {
+        //     return res.status(403).json({
+        //         error: "You're not authorized to see this board"
+        //     });
+        // }
+
+        // Return a response back to the client
         return res.status(200).json(board);
     } catch (err) {
         console.log(`${err}`);

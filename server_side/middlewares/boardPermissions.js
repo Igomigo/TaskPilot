@@ -14,7 +14,7 @@ exports.permitUser = async (req, res, next) => {
             ]
         });
         if (!board) {
-            return res.status(403).json({message: "You do not have poermission to access this board"});
+            return res.status(403).json({message: "You do not have permission to access this board"});
         }
         next();
     } catch (err) {
