@@ -17,10 +17,6 @@ const listSchema = new Schema({
         ref: "Board",
         required: true
     },
-    description: {
-        type: String,
-        maxLength: 100
-    },
     cards: [{
         type: Schema.Types.ObjectId,
         ref: "Card"
