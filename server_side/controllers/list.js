@@ -10,7 +10,7 @@ exports.createList = async (req, res) => {
     // Creates a new list within a board
     try {
         const boardId = req.params.boardId;
-        const {title, description, position} = req.body;
+        const {title, position} = req.body;
         if (!title) {
             return res.status(400).json({error: "missing title"});
         }
@@ -19,18 +19,20 @@ exports.createList = async (req, res) => {
         }
         const list = new List({
             title: title,
-            description: description,
             position: position,
             board: boardId,
             createdBy: req.current_user._id
         });
         const savedList = await list.save();
+
         // update the board accordingly
         await Board.findByIdAndUpdate(boardId,
             {$push: {"lists": savedList._id},
             updatedAt: Date.now( )},
             {new: true}
         );
+
+        // Log the change
         const logger = new ActivityLog({
             action: "create",
             entity: "List",
@@ -41,8 +43,10 @@ exports.createList = async (req, res) => {
             listId: list._id
         });
         await logger.save();
+
         // return a response to the client
         return res.status(201).json(savedList);
+        
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
