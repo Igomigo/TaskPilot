@@ -1,6 +1,11 @@
-f#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.scroll::-webkit-scrollbar {
+  width: 9px;
+}
+
+.scroll::-webkit-scrollbar-track {
+  @apply bg-gray-700;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+  @apply bg-gray-500 rounded-full
 }
