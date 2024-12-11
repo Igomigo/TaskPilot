@@ -63,12 +63,14 @@ const BoardPage = () => {
   const [boardData, setBoardData] = useState({});
   const [lists, setLists] = useState([]);
   const [showList, setShowList] = useState(false);
+  const [showCardInputs, setShowCardInputs] = useState({});
   const [newList, setNewList] = useState({
     title: "",
     position: 0
   });
   const [newCard, setNewCard] = useState();
-  const [loading, setLoading] = useState(false);
+  const [listLoading, setlistLoading] = useState(false);
+  const [cardLoading, setCardLoading] = useState(false);
 
   // Handle on change event for a new list
   const handleOnchangeForNewList = (e) => {
@@ -79,8 +81,8 @@ const BoardPage = () => {
     });
   }
 
-  // Handle Submit Form
-  const handleSubmit = async (e) => {
+  // Handle Submit Form for a new list
+  const handleSubmitList = async (e) => {
     e.preventDefault();
     const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}/list`;
 
@@ -100,7 +102,7 @@ const BoardPage = () => {
       return;
     }
 
-    setLoading(true);
+    setlistLoading(true);
 
     try {
       const response = await fetch(url, {
@@ -139,7 +141,76 @@ const BoardPage = () => {
       console.log("Error:", error.message);
 
     } finally {
-      setLoading(false);
+      setlistLoading(false);
+    }
+  }
+
+  // Toggle between card states
+  const toggleCardInputState = (listId) => {
+    setShowCardInputs(prev => ({
+      ...prev,
+      [listId]: !prev[listId]
+    }));
+  }
+
+  // Handle submit card
+  const handleSubmitCard = async (e, listId) => {
+    e.preventDefault();
+    const cardTitle = e.target.cardTitle.value;
+    if (cardTitle.trim()) {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/b/${listId}/card`;
+
+      const token = user?.token;
+
+      if (!token) {
+        console.warn("No token available; redirecting to login.");
+        navigate("/login");
+        return;
+      }
+
+      setCardLoading(true);
+
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          body: JSON.stringify({title: cardTitle}),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401) {
+          // Token is invalid or expired, redirect to login
+          toast.error("Session expired, redirecting to login");
+          localStorage.removeItem("token");
+          dispatch(logout());
+          navigate("/login");
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error("An error occured");
+        }
+
+        const newCard = await response.json();
+
+        // Update the respective list's card array with the new card
+        setLists(prev => 
+          prev.map(list => 
+            list._id === listId ? {...list, cards: [...list.cards, newCard]} : list
+          )
+        );
+
+        e.target.reset();
+        toggleCardInputState(listId);
+
+      } catch (error) {
+        console.log("Error:", error.message);
+
+      } finally {
+        setCardLoading(false);
+      }
     }
   }
 
@@ -194,12 +265,12 @@ const BoardPage = () => {
     } else {
       console.warn("User token not available yet");
     }
-  }, [user]);
+  }, [user, navigate, boardId]);
 
   return (
     <div className='h-screen overflow-hidden'>
       <div className='flex shadow-lg justify-between p-6 text-sm border-gray-800 border-b h-10 px-4 items-center'>
-        <h2 className='text-lg text-gray-200 font-bold mr-4 text-ellipsis line-clamp-1'>{BoardName}</h2>
+        <h2 className='text-lg text-gray-200 font-bold mr-4 text-ellipsis line-clamp-1'>{boardData.title}</h2>
         <button className='text-gray-300 hover:text-white'>
           <PiDotsThreeOutlineVerticalFill size={18} />
         </button>
@@ -220,7 +291,7 @@ const BoardPage = () => {
                   {
                     list?.cards?.length > 0 ? (
                       list?.cards?.map(card => (
-                        <Link key={card?._id} to={`/b/${list?._id}/${card?.title}`} className='group'>
+                        <Link key={card._id} to={`/b/${list?._id}/${card?.title}`} className='group'>
                           <div className='bg-bg-color group-hover:border text-gray-300 shadow rounded-lg p-3 mb-2 mx-2'>
                             <p className='text-sm'>{card?.title}</p>
                           </div>
@@ -230,10 +301,29 @@ const BoardPage = () => {
                   }
                 </div>
                 <div className='flex-shrink-0 px-2 py-2'>
-                  <button className='text-white flex space-x-1 justify-center items-center px-2 py-1 rounded-md hover:bg-gray-600'>
-                    <FaPlus size={15}/>
-                    <p className='text-sm'>Add a card</p>
-                  </button>
+                  {
+                    showCardInputs[list._id] ? (
+                      <form onSubmit={(e) => handleSubmitCard(e, list._id)} className='w-full h-fit'>
+                        <input
+                          type='text'
+                          name='cardTitle'
+                          className='w-full text-white px-3 py-2 focus:outline-none text-sm bg-input-bg rounded-lg '
+                          placeholder='Card title...'
+                        />
+                        <div className='flex mt-2'>
+                          <button type='submit' className='text-sm mr-2 bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded-lg text-white'>
+                            {cardLoading ? "Saving..." : "Save"}
+                          </button>
+                          <button type="button" onClick={() => toggleCardInputState(list._id)} className='text-sm text-gray-300 hover:border-white hover:text-white border border-gray-500 px-3 py-1 rounded-lg'>Cancel</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <button onClick={() => toggleCardInputState(list._id)} className='text-white flex space-x-1 justify-center items-center px-2 py-1 rounded-md hover:bg-gray-600'>
+                        <FaPlus size={15}/>
+                        <p className='text-sm'>Add a card</p>
+                      </button>
+                    )
+                  }
                 </div>
               </div>
             ))
@@ -241,20 +331,21 @@ const BoardPage = () => {
         }
         {
           showList && (
-            <form onSubmit={handleSubmit} className='w-fit flex-shrink-0 h-fit mr-4'>
+            <form onSubmit={handleSubmitList} className='w-fit flex-shrink-0 h-fit mr-4'>
               <input
                 type='text'
                 name='title'
                 onChange={handleOnchangeForNewList}
-                className='px-4 py-3 text-white focus:outline-none bg-input-bg rounded-lg'
+                className='px-4 font-semibold py-3 text-white focus:outline-none bg-input-bg rounded-lg'
+                placeholder='List title...'
               />
               <div className='flex items-center mt-2'>
-                <button type="submit" className="text-sm mr-3 bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded-lg text-white">
+                <button type="submit" className="text-sm mr-2 bg-emerald-600 hover:bg-emerald-700 px-3 py-1 rounded-lg text-white">
                   {
-                    loading ? "Saving..." : "Save"
+                    listLoading ? "Saving..." : "Save"
                   }
                 </button>
-                <button onClick={() => setShowList(false)} className='text-sm text-gray-300 hover:border-white hover:text-white border border-gray-500 px-3 py-1 rounded-lg'>
+                <button type="button" onClick={() => setShowList(false)} className='text-sm text-gray-300 hover:border-white hover:text-white border border-gray-500 px-3 py-1 rounded-lg'>
                   Cancel
                 </button>
               </div>
