@@ -10,19 +10,22 @@ const ActivityLog = require("../models/activityLog");
 
 exports.createCard = async (req, res) => {
     // Creates a new card and updates the related list document
+    const listId = req.params.listId;
+    const current_user = req.current_user;
+    const {title} = req.body;
+
     try {
-        const listId = req.params.listId;
-        const current_user = req.current_user;
-        const {title} = req.body;
         if (!title) {
             return res.status(400).json({error: "missing title"});
         }
+
         const card = new Card({
             title: title,
             listId: listId,
             createdBy: current_user._id
         });
         const savedCard = await card.save();
+
         // update the list accordingly
         const list = await List.findByIdAndUpdate(listId, {
             $push: {"cards": savedCard._id},
@@ -30,6 +33,7 @@ exports.createCard = async (req, res) => {
             },
             {new: true}
         );
+
         // Create the actiivity log
         const logger = new ActivityLog({
             action: "create",
@@ -42,11 +46,10 @@ exports.createCard = async (req, res) => {
             cardId: card._id
         });
         await logger.save();
-        // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(list.board).emit("createCard", savedCard);
+
         // return a response to the client
         return res.status(201).json(savedCard);
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
