@@ -9,6 +9,7 @@ import SettingsPage from "../pages/SettingsPage";
 import Layout from "../layout/Layout";
 import NotificationsPage from "../pages/NotificationsPage";
 import ActivityLogPage from "../pages/ActivityLogPage";
+import CardPage from "../pages/CardPage";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -25,6 +26,10 @@ const router = createBrowserRouter([{
                 {
                     path: "boards/:boardId",
                     element: <BoardPage />
+                },
+                {
+                    path: "b/:listId/:cardTitle",
+                    element: <CardPage />
                 },
                 {
                     path: "profile/:username",

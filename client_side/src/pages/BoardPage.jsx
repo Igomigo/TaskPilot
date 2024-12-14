@@ -6,51 +6,52 @@ import { FaPlus } from "react-icons/fa6";
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/userSlice';
+import { useRef } from 'react';
+import { MdGroups } from "react-icons/md";
+import { IoMdArchive } from "react-icons/io";
 
 // Dummy board data
-const initialLists = [
-  {
-    id: '1',
-    title: 'To Do',
-    cards: [
-      { id: '1', content: 'Research market trends' },
-      { id: '2', content: 'Create project proposal' },
-      { id: '3', content: 'Analyze competitor strategies' },
-      { id: '4', content: 'Define target audience' },
-      { id: '5', content: 'Outline project timeline' },
-      { id: '6', content: 'Estimate budget requirements' },
-      { id: '7', content: 'Identify potential risks' },
-      { id: '8', content: 'Draft initial project plan' },
-      { id: '9', content: 'Design user interface' },
-      { id: '10', content: 'Develop backend API' },
-      { id: '11', content: 'Implement authentication' },
-      { id: '12', content: 'Set up CI/CD pipeline' },
-    ]
-  },
-  {
-    id: '2',
-    title: 'In Progress',
-    cards: [
-      { id: '9', content: 'Design user interface' },
-      { id: '10', content: 'Develop backend API' },
-      { id: '11', content: 'Implement authentication' },
-      { id: '12', content: 'Set up CI/CD pipeline' },
-    ]
-  },
-  {
-    id: '3',
-    title: 'Done',
-    cards: [
-      { id: '13', content: 'Project kickoff meeting' },
-      { id: '14', content: 'Define project scope' },
-      { id: '10', content: 'Develop backend API' },
-      { id: '11', content: 'Implement authentication' },
-      { id: '12', content: 'Set up CI/CD pipeline' },
-    ]
-  }
-]
-
-const BoardName = "Software planing and all of that"
+// const initialLists = [
+//   {
+//     id: '1',
+//     title: 'To Do',
+//     cards: [
+//       { id: '1', content: 'Research market trends' },
+//       { id: '2', content: 'Create project proposal' },
+//       { id: '3', content: 'Analyze competitor strategies' },
+//       { id: '4', content: 'Define target audience' },
+//       { id: '5', content: 'Outline project timeline' },
+//       { id: '6', content: 'Estimate budget requirements' },
+//       { id: '7', content: 'Identify potential risks' },
+//       { id: '8', content: 'Draft initial project plan' },
+//       { id: '9', content: 'Design user interface' },
+//       { id: '10', content: 'Develop backend API' },
+//       { id: '11', content: 'Implement authentication' },
+//       { id: '12', content: 'Set up CI/CD pipeline' },
+//     ]
+//   },
+//   {
+//     id: '2',
+//     title: 'In Progress',
+//     cards: [
+//       { id: '9', content: 'Design user interface' },
+//       { id: '10', content: 'Develop backend API' },
+//       { id: '11', content: 'Implement authentication' },
+//       { id: '12', content: 'Set up CI/CD pipeline' },
+//     ]
+//   },
+//   {
+//     id: '3',
+//     title: 'Done',
+//     cards: [
+//       { id: '13', content: 'Project kickoff meeting' },
+//       { id: '14', content: 'Define project scope' },
+//       { id: '10', content: 'Develop backend API' },
+//       { id: '11', content: 'Implement authentication' },
+//       { id: '12', content: 'Set up CI/CD pipeline' },
+//     ]
+//   }
+// ]
 
 const BoardPage = () => {
   // Hooks
@@ -58,6 +59,7 @@ const BoardPage = () => {
   const user = useSelector(state => state?.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const activityModalRef = useRef(null);
 
   // State Management
   const [boardData, setBoardData] = useState({});
@@ -71,6 +73,7 @@ const BoardPage = () => {
   const [newCard, setNewCard] = useState();
   const [listLoading, setlistLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
+  const [showActivityModal, setShowActivityModal] = useState(false);
 
   // Handle on change event for a new list
   const handleOnchangeForNewList = (e) => {
@@ -128,7 +131,7 @@ const BoardPage = () => {
       }
 
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       setLists(prev => [
         ...prev,
         data
@@ -267,13 +270,41 @@ const BoardPage = () => {
     }
   }, [user, navigate, boardId]);
 
+  // Close activitymodal when user clicks anywhere on the screen
+  useEffect(() => {
+    function handleClickOutside(event) {
+        if (activityModalRef.current && !activityModalRef.current.contains(event.target)) {
+            setShowActivityModal(false);
+        }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
+}, []);
+
   return (
     <div className='h-screen overflow-hidden'>
-      <div className='flex shadow-lg justify-between p-6 text-sm border-gray-800 border-b h-10 px-4 items-center'>
+      <div ref={activityModalRef} className='flex shadow-lg relative justify-between p-6 text-sm border-gray-800 border-b h-10 px-4 items-center'>
         <h2 className='text-lg text-gray-200 font-bold mr-4 text-ellipsis line-clamp-1'>{boardData.title}</h2>
-        <button className='text-gray-300 hover:text-white'>
+        <button onClick={() => setShowActivityModal(prev => !prev)} className='text-gray-300 p-2 rounded-lg hover:text-white focus:bg-input-bg hover:bg-input-bg'>
           <PiDotsThreeOutlineVerticalFill size={18} />
         </button>
+        {
+          showActivityModal && (
+            <div className='absolute text-sm border border-slate-700 right-0 mr-6 top-0 px-2 py-4 w-fit mt-11 rounded-md bg-form-bg h-fit text-white'>
+              <div className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
+                <MdGroups className='mr-3' size={23}/>
+                <button>Board members</button>
+              </div>
+              <div className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
+                <IoMdArchive className='mr-3' size={23}/>
+                <button>Archive this board</button>
+              </div>
+            </div>
+          )
+        }
       </div>
       <div className='flex px-4 py-4 overflow-x-auto scroll overflow-y-hidden h-[calc(100vh-105px)]'>
         {
@@ -292,12 +323,14 @@ const BoardPage = () => {
                     list?.cards?.length > 0 ? (
                       list?.cards?.map(card => (
                         <Link key={card._id} to={`/b/${list?._id}/${card?.title}`} className='group'>
-                          <div className='bg-bg-color group-hover:border text-gray-300 shadow rounded-lg p-3 mb-2 mx-2'>
+                          <div className='bg-bg-color text-gray-300 shadow rounded-lg p-3 mb-2 mx-2 border border-transparent transition-colors duration-200 ease-in-out group-hover:border-gray-200'>
                             <p className='text-sm'>{card?.title}</p>
                           </div>
                         </Link>
                       ))
-                    ) : ("")
+                    ) : (
+                      <div className='text-gray-400 text-sm p-3'>No cards in this list</div>
+                    )
                   }
                 </div>
                 <div className='flex-shrink-0 px-2 py-2'>
