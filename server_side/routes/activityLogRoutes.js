@@ -7,6 +7,12 @@ const express = require("express");
 const router = express.Router();
 
 /**
+ * GET request for activity logs for a user
+ * url: http://localhost:3000/b/activity-log
+ */
+router.get("/activity-log", authWare, Log.getAllActivities);
+
+/**
  * GET request for activity logs within the board
  * url: http://localhost:3000/b/activity/:boardId
  */

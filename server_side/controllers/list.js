@@ -37,7 +37,7 @@ exports.createList = async (req, res) => {
             action: "create",
             entity: "List",
             entityId: list._id,
-            details: `${req.current_user.username} created ${list.title}`,
+            details: `${req.current_user.username} created the list: ${list.title}`,
             createdBy: req.current_user._id,
             boardId: boardId,
             listId: list._id
@@ -46,7 +46,7 @@ exports.createList = async (req, res) => {
 
         // return a response to the client
         return res.status(201).json(savedList);
-        
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
