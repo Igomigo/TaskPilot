@@ -186,7 +186,7 @@ const CardPage = () => {
                                     {comments.map((c) => (
                                         <div key={c.id} className="bg-gray-600 rounded p-3">
                                             <div className="flex justify-between items-center mb-2">
-                                                <span className="font-medium text-white">{c.author}</span>
+                                                <span className="font-medium text-sm text-white">{c.author}</span>
                                                 <span className="text-xs text-gray-400">{c.timestamp}</span>
                                             </div>
                                             <p className="text-sm text-gray-300">{c.text}</p>
