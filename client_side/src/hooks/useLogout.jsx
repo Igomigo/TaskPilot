@@ -5,7 +5,7 @@ import { logout } from '../redux/userSlice';
 const navigate = useNavigation();
 const dispatch = useDispatch();
 
-export default function logout() {
+export default function Logout() {
     localStorage.removeItem("token");
     dispatch(logout());
     navigate("/login");

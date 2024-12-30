@@ -8,8 +8,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch } from 'react-redux';
-import { logout } from '../redux/userSlice';
 import Avatar from './Avatar';
+import Logout from '../hooks/useLogout';
 
 const Topbar = ({ toggleSidebar, user }) => {
     // Hooks
@@ -43,9 +43,7 @@ const Topbar = ({ toggleSidebar, user }) => {
 
     // Handle logout
     const logOut = () => {
-        localStorage.removeItem("token");
-        dispatch(logout());
-        navigate("/login");
+        Logout();
     }
 
     return (

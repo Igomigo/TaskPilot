@@ -5,7 +5,7 @@ import { Link, useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa6";
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../redux/userSlice';
+import Logout from '../hooks/useLogout';
 import { useRef } from 'react';
 import { MdGroups } from "react-icons/md";
 import { IoMdArchive } from "react-icons/io";
@@ -241,10 +241,7 @@ const BoardPage = () => {
       if (response.status === 401) {
         // Token is invalid or expired, redirect to login
         toast.error("Session expired, redirecting to login");
-        localStorage.removeItem("token");
-        dispatch(logout());
-        navigate("/login");
-        return;
+        Logout();
       }
 
       if (!response.ok) {

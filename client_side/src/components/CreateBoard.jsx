@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import Loading from './loading';
 import { formatDistanceToNow } from 'date-fns';
+import Logout from '../hooks/useLogout';
 
 const CreateBoard = ({ onClose, user, updateBoards }) => {
   // State Management
@@ -26,10 +27,7 @@ const CreateBoard = ({ onClose, user, updateBoards }) => {
       });
 
       if (response.status === 401) {
-        localStorage.removeItem("token");
-        dispatch(logout());
-        navigate("/login");
-        return;
+        Logout();
       }
       
       if (response?.status === 400) {

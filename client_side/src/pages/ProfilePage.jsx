@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaImage } from "react-icons/fa6";
 import toast from 'react-hot-toast';
 import uploadFile from '../helpers/UploadFile';
-import { logout, setUser } from '../redux/userSlice';
+import { setUser } from '../redux/userSlice';
 import Loading from '../components/loading';
+import Logout from '../hooks/useLogout';
 
 const ProfilePage = () => {
     //Hooks
@@ -75,10 +76,7 @@ const ProfilePage = () => {
             });
 
             if (response.status === 401) {
-                localStorage.removeItem("token");
-                dispatch(logout());
-                navigate("/login");
-                return;
+                Logout();
             }
 
             if (response.status === 409) {

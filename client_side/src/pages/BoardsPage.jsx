@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaPlus } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../redux/userSlice';
+import Logout from '../hooks/useLogout';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '../components/Avatar';
 import CreateBoard from '../components/CreateBoard';
@@ -52,10 +52,7 @@ const BoardsPage = () => {
 
         if (response?.status === 401) {
           // Token is invalid or expired, redirect to login
-          localStorage.removeItem("token");
-          dispatch(logout());
-          navigate("/login");
-          return;
+          Logout();
         }
 
         //console.log("Response:", response);
