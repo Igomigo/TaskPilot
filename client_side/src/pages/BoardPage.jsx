@@ -176,7 +176,7 @@ const BoardPage = () => {
       try {
         const response = await fetch(url, {
           method: "POST",
-          body: JSON.stringify({title: cardTitle}),
+          body: JSON.stringify({title: cardTitle, boardId}),
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
