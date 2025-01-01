@@ -16,6 +16,11 @@ const CardSchema = new Schema({
         type: Date,
         default: null
     },
+    status: {
+        type: String,
+        enum: ['pending', 'overdue', 'completed'],
+        default: "pending"
+    },
     comments: [{
         type: Schema.Types.ObjectId,
         ref: "Comment"
@@ -23,6 +28,11 @@ const CardSchema = new Schema({
     listId: {
         type: Schema.Types.ObjectId,
         ref: "List",
+        required: true
+    },
+    boardId: {
+        type: Schema.Types.ObjectId,
+        ref: "Board",
         required: true
     },
     createdBy: {

@@ -12,7 +12,7 @@ exports.createCard = async (req, res) => {
     // Creates a new card and updates the related list document
     const listId = req.params.listId;
     const current_user = req.current_user;
-    const {title} = req.body;
+    const {title, boardId} = req.body;
 
     try {
         if (!title) {
@@ -21,6 +21,7 @@ exports.createCard = async (req, res) => {
 
         const card = new Card({
             title: title,
+            boardId: boardId,
             listId: listId,
             createdBy: current_user._id
         });
