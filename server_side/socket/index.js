@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
 const cron = require("node-cron");
+const checkDeadline = require("../utils/deadlineChecker");
 
-
-export default function setupSocketServer(io) {
+function setupSocketServer(io) {
     // Middleware for authentication
     io.use((socket, next) => {
         const token = socket.handshake.auth.token;
         if (!token) {
+            console.log("No token provided");
             return next(new Error("No token provided"));
         }
 
@@ -45,5 +46,17 @@ export default function setupSocketServer(io) {
     });
 
     // Schedule deadline checker using cron
-    
+    cron.schedule('* * * * *', async () => {
+        console.log("Running deadline check for all boards...");
+        const overdueCardsByBoardId = await checkDeadline();
+
+        for (const [boardId, overdueCards] of Object.entries(overdueCardsByBoardId)) {
+            if (overdueCards.length > 0) {
+                console.log(overdueCards);
+                io.to(boardId).emit("overdueCards", overdueCards);
+            }
+        }
+    });
 }
+
+module.exports = setupSocketServer;

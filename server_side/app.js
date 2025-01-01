@@ -16,6 +16,7 @@ const listRoute = require("./routes/listRoute");
 const cardRoute = require("./routes/cardRoute");
 const commentRoute = require("./routes/commentRoute");
 const logRoute = require("./routes/activityLogRoutes");
+const setupSocketServer = require("./socket/index");
 
 // Initialize the express app
 const app = express();
@@ -50,6 +51,9 @@ app.get("/ping", authWare, (req, res) => {
     res.status(200).json("Server says pong");
     console.log("Pong");
 });
+
+// Call the socket connection
+setupSocketServer(io);
 
 // run the server
 server.listen(PORT, () => {

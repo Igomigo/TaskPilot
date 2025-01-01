@@ -1,6 +1,6 @@
 const Card = require("../models/card");
 
-export default async function checkDeadline() {
+async function checkDeadline() {
     // Checks and returns lists with expired deadlines for a specific board
     const now = new Date();
 
@@ -36,3 +36,5 @@ export default async function checkDeadline() {
 
     return overdueCardsByBoardId;
 }
+
+module.exports = checkDeadline;
