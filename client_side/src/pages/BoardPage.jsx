@@ -188,6 +188,11 @@ const BoardPage = () => {
           handleLogout();
         }
 
+        if (response.status === 409) {
+          toast.error("Card already exists in this list");
+          setShowCardInputs(false);
+        }
+
         if (!response.ok) {
           throw new Error("An error occured");
         }
@@ -285,14 +290,21 @@ const BoardPage = () => {
       }
     });
 
-    console.log("Socket connection:", socketConnection);
+    //console.log("Socket connection:", socketConnection);
 
     socketConnection.on("Auth_error", data => {
       toast.error()
       handleLogout();
     });
 
+    // Emit the join board event
     socketConnection.emit("joinBoard", boardId);
+
+    // Listen for the overdue cards event
+    socketConnection.on("overdueCards", overdueCards => {
+      console.log(overdueCards);
+    });
+    
   }, [boardId]);
 
   return (

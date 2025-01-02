@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MdClose, MdAccessTime } from "react-icons/md";
 import { FaRegCreditCard } from "react-icons/fa6";
 import { AiOutlineAlignLeft } from "react-icons/ai";
 import { FaRegCommentAlt } from "react-icons/fa";
 import { FiCheck } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
 const CardPage = () => {
+    // Hooks
     const { listId, cardTitle } = useParams();
     const navigate = useNavigate();
+    const user = useSelector(state => state?.user);
 
+    // State Management
     const [title, setTitle] = useState(cardTitle);
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
@@ -37,6 +41,47 @@ const CardPage = () => {
             setComment("");
         }
     };
+
+    useEffect(() => {
+        const url = `${import.meta.env.BACKEND_URL}/b/cards/${cardTitle}`;
+
+        const getCardDetails = async () => {
+            try {
+                const token = user?.token;
+
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+                console.log(response);
+
+                if (!response.ok) {
+                    throw new Error("Error retrieving card details");
+                }
+
+                const cardData = await response.json();
+                console.log(cardData);
+
+                setTitle(cardData.title);
+                setDescription(cardData.description);
+                setComments(cardData.comments);
+                setDueDate(cardData.dueDate);
+                setIsChecked(cardData.checked);
+
+            } catch (error) {
+                console.log("Error:", error.message);
+            }
+        }
+
+        if (user) {
+            getCardDetails();
+        } else {
+            console.log("User data not yet loaded");
+        }
+    }, [cardTitle]);
 
     return (
         <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center pt-10 px-4 sm:px-6 lg:px-8">
