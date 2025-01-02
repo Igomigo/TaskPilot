@@ -5,10 +5,11 @@ import { Link, useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa6";
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import Logout from '../hooks/useLogout';
+import useLogout from '../hooks/useLogout';
 import { useRef } from 'react';
 import { MdGroups } from "react-icons/md";
 import { IoMdArchive } from "react-icons/io";
+import io from "socket.io-client";
 
 // Dummy board data
 // const initialLists = [
@@ -60,6 +61,7 @@ const BoardPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const activityModalRef = useRef(null);
+  const handleLogout = useLogout();
 
   // State Management
   const [boardData, setBoardData] = useState({});
@@ -120,10 +122,7 @@ const BoardPage = () => {
       if (response.status === 401) {
         // Token is invalid or expired, redirect to login
         toast.error("Session expired, redirecting to login");
-        localStorage.removeItem("token");
-        dispatch(logout());
-        navigate("/login");
-        return;
+        handleLogout();
       }
 
       if (!response.ok) {
@@ -186,10 +185,7 @@ const BoardPage = () => {
         if (response.status === 401) {
           // Token is invalid or expired, redirect to login
           toast.error("Session expired, redirecting to login");
-          localStorage.removeItem("token");
-          dispatch(logout());
-          navigate("/login");
-          return;
+          handleLogout();
         }
 
         if (!response.ok) {
@@ -241,7 +237,7 @@ const BoardPage = () => {
       if (response.status === 401) {
         // Token is invalid or expired, redirect to login
         toast.error("Session expired, redirecting to login");
-        Logout();
+        handleLogout();
       }
 
       if (!response.ok) {
@@ -279,7 +275,25 @@ const BoardPage = () => {
     return () => {
         document.removeEventListener("mousedown", handleClickOutside);
     };
-}, []);
+  }, []);
+
+  // Establish socket connection
+  useEffect(() => {
+    const socketConnection = io(import.meta.env.VITE_BACKEND_URL, {
+      auth: {
+        token: localStorage.getItem("token")
+      }
+    });
+
+    console.log("Socket connection:", socketConnection);
+
+    socketConnection.on("Auth_error", data => {
+      toast.error()
+      handleLogout();
+    });
+
+    socketConnection.emit("joinBoard", boardId);
+  }, [boardId]);
 
   return (
     <div className='h-screen overflow-hidden'>

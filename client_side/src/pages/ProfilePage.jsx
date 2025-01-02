@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import uploadFile from '../helpers/UploadFile';
 import { setUser } from '../redux/userSlice';
 import Loading from '../components/loading';
-import Logout from '../hooks/useLogout';
+import useLogout from '../hooks/useLogout';
 
 const ProfilePage = () => {
     //Hooks
@@ -15,6 +15,7 @@ const ProfilePage = () => {
     const user = useSelector(state => state?.user);
     const dispatch = useDispatch();
     const navigate = useNavigation();
+    const handleLogout = useLogout();
 
     useEffect(() => {
         setCredentials({
@@ -76,7 +77,7 @@ const ProfilePage = () => {
             });
 
             if (response.status === 401) {
-                Logout();
+                handleLogout();
             }
 
             if (response.status === 409) {

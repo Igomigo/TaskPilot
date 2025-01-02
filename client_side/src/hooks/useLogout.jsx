@@ -1,13 +1,17 @@
 import { useDispatch } from "react-redux";
-import { useNavigation } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { logout } from '../redux/userSlice'
 
-export default function Logout() {
-    const navigate = useNavigation();
+export default function useLogout() {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    localStorage.removeItem("token");
-    dispatch(logout());
-    navigate("/login");
-    return;
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        console.log("logout function called");
+        dispatch(logout());
+        navigate("/login");
+    };
+
+    return handleLogout;
 }

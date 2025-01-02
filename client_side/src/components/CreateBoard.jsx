@@ -2,9 +2,12 @@ import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import Loading from './loading';
 import { formatDistanceToNow } from 'date-fns';
-import Logout from '../hooks/useLogout';
+import useLogout from '../hooks/useLogout';
 
 const CreateBoard = ({ onClose, user, updateBoards }) => {
+  // Hooks
+  const handleLogout = useLogout();
+
   // State Management
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,7 +30,7 @@ const CreateBoard = ({ onClose, user, updateBoards }) => {
       });
 
       if (response.status === 401) {
-        Logout();
+        handleLogout();
       }
       
       if (response?.status === 400) {

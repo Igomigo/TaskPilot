@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaPlus } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import Logout from '../hooks/useLogout';
+import useLogout from '../hooks/useLogout';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '../components/Avatar';
 import CreateBoard from '../components/CreateBoard';
@@ -12,6 +12,7 @@ const BoardsPage = () => {
   const navigate = useNavigate();
   const user = useSelector(state => state?.user);
   const dispatch = useDispatch();
+  const handleLogout = useLogout();
 
   // State Management
   const [boards, setBoards] = useState([]);
@@ -52,7 +53,7 @@ const BoardsPage = () => {
 
         if (response?.status === 401) {
           // Token is invalid or expired, redirect to login
-          Logout();
+          handleLogout();
         }
 
         //console.log("Response:", response);
@@ -86,52 +87,6 @@ const BoardsPage = () => {
   const handleOnclose = () => {
     setCreateBoard(false);
   }
-  
-  
-  /** const Boards = [
-    {
-      updatedAt: "Updated 2h ago",
-      title: "Project 1",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla in tortor pharetra, at pulvinar lorem molestie.",
-      status: "In Progress",
-      _id: 1
-    },
-    {
-      updatedAt: "Updated 2h ago",
-      title: "Project 2",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla in tortor pharetra, at pulvinar lorem molestie.",
-      status: "Completed",
-      _id: 2
-    },
-    {
-      updatedAt: "Updated 2h ago",
-      title: "Project 3",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla in tortor pharetra, at pulvinar lorem molestie.",
-      status: "In Progress",
-      _id: 3
-    },
-    {
-      updatedAt: "Updated 2h ago",
-      title: "Project 4",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla in tortor pharetra, at pulvinar lorem molestie.",
-      status: "In Progress",
-      _id: 4
-    },
-    {
-      updatedAt: "Updated 2h ago",
-      title: "Project 5",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla in tortor pharetra, at pulvinar lorem molestie.",
-      status: "In Progress",
-      _id: 5
-    },
-    {
-      updatedAt: "Updated 2h ago",
-      title: "Project 6",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare nulla in tortor pharetra, at pulvinar lorem molestie.",
-      status: "Completed",
-      _id: 6
-    }
-  ] */
 
   return (
     <main className='flex-1 relative mb-5 overflow-auto py-2 px-4'>

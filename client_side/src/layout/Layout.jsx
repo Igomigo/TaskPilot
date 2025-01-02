@@ -4,13 +4,14 @@ import Topbar from '../components/Topbar';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, setToken, setUser } from '../redux/userSlice';
-import Logout from '../hooks/useLogout';
+import useLogout from '../hooks/useLogout';
 
 const Layout = () => {
   // Hooks
   const user = useSelector(state => state?.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const handleLogout = useLogout();
 
   // State Management
   const [showSidebar, setShowSidebar] = useState(false);
@@ -46,7 +47,7 @@ const Layout = () => {
 
         if (response?.status === 401) {
           // Token is invalid or expired, redirect to login
-          Logout();
+          handleLogout();
         }
 
         if (!response.ok) {
@@ -86,7 +87,7 @@ const Layout = () => {
         });
 
         if (response.status === 401) {
-          Logout();
+          handleLogout();
         }
 
         if (!response.ok) {
