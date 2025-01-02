@@ -3,6 +3,7 @@ const Card = require("../models/card");
 async function checkDeadline() {
     // Checks and returns lists with expired deadlines for a specific board
     const now = new Date();
+    //console.log("Check deadline function called");
 
     // Find and update overdue cards
     const overdueCards = await Card.find(

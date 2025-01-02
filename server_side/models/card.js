@@ -6,7 +6,8 @@ const CardSchema = new Schema({
     title: {
         type: String,
         required: true,
-        maxLength: 50
+        maxLength: 50,
+        unique: true
     },
     description: {
         type: String,

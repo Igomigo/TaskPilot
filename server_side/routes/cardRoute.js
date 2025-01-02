@@ -14,9 +14,9 @@ router.post("/:listId/card", authWare, card.createCard);
 
 /**
  * GET request to retrieve a card data
- * url: http://localhost:3000/b/cards/:cardId
+ * url: http://localhost:3000/b/cards/:cardTitle
  */
-router.get("/cards/:cardId", authWare, card.getCard);
+router.get("/cards/:cardTitle", authWare, card.getCard);
 
 /**
  * PUT request to update a card data

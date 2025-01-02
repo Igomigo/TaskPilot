@@ -20,6 +20,7 @@ function setupSocketServer(io) {
                 }
                 return next(new Error("Authentication Error"));
             }
+            console.log("Socket connected successfully");
 
             socket.userId = decoded.userId;
             next();
@@ -31,6 +32,10 @@ function setupSocketServer(io) {
         console.log("A user connected:", socket.userId);
 
         socket.on("joinBoard", (boardId) => {
+            if (!boardId) {
+                console.log("Invalid board Id received");
+                return;
+            }
             socket.join(boardId);
             console.log(`User ${socket.userId} joined the board ${boardId}`);
         });

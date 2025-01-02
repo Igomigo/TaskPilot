@@ -19,6 +19,19 @@ exports.createCard = async (req, res) => {
             return res.status(400).json({error: "missing title"});
         }
 
+        // Check that another card with same title doesn't exist
+        const exists = await Card.find({
+            title: title,
+            listId: listId
+        });
+
+        if (exists) {
+            return res.status(409).json({
+                error: true,
+                message: "Card already exists in this list"
+            });
+        }
+
         const card = new Card({
             title: title,
             boardId: boardId,
@@ -60,13 +73,20 @@ exports.createCard = async (req, res) => {
 
 exports.getCard = async (req, res) => {
     // Retrieves a specific card
+    const cardTitle = req.params.cardTitle;
+
     try {
-        const cardId = req.params.cardId;
-        const card = await Card.findById(cardId).populate("comments");
+        const card = await Card.findOne({
+            title: cardTitle
+        }).populate("comments");
+
         if (!card) {
             return res.status(404).json({error: "card not found"});
         }
+        console.log(card);
+
         return res.status(200).json(card);
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
@@ -109,8 +129,8 @@ exports.updateCard = async (req, res) => {
         card.updatedAt = Date.now();
         await card.save();
         // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(list.board).emit("updateCard", card);
+        //const io = req.app.get("socketio");
+        //io.to(list.board).emit("updateCard", card);
         // return a response to the client
         return res.status(200).json(card);
     } catch (err) {
