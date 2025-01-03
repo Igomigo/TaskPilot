@@ -14,13 +14,15 @@ exports.createCard = async (req, res) => {
     const current_user = req.current_user;
     const {title, boardId} = req.body;
 
+    console.log("boardId:", boardId);
+
     try {
         if (!title) {
             return res.status(400).json({error: "missing title"});
         }
 
         // Check that another card with same title doesn't exist
-        const exists = await Card.find({
+        const exists = await Card.findOne({
             title: title,
             listId: listId
         });
@@ -78,12 +80,17 @@ exports.getCard = async (req, res) => {
     try {
         const card = await Card.findOne({
             title: cardTitle
-        }).populate("comments");
+        }).populate({
+            path: "comments",
+            populate: {
+                path: "createdBy",
+                model: "User"
+            }
+        });
 
         if (!card) {
             return res.status(404).json({error: "card not found"});
         }
-        console.log(card);
 
         return res.status(200).json(card);
 
@@ -100,42 +107,46 @@ exports.updateCard = async (req, res) => {
     try {
         const current_user = req.current_user;
         const cardId = req.params.cardId;
-        const data = req.body;
-        const card = await Card.findById(cardId);
+        const updateData = req.body;
+        
+        // Find the card and update only the fields provided in updateData
+        await Card.findByIdAndUpdate(
+            cardId,
+            { $set: updateData }
+        );
+
+        const card = await Card.findById(cardId).populate("boardId");
+
         if (!card) {
             return res.status(404).json({error: "Card not found"});
         }
-        const list = await List.findById(card.listId);
-        // prepare logDetails
-        let logDetails = [];
-        Object.keys(data).forEach(key => {
-            if (card[key] !== data[key]) {
-                logDetails.push(`${current_user.username} changed ${card[key]} to ${data[key]}`);
-                card[key] = data[key];
-            }
-        });
+
+        // Prepare logDetails
+        let logDetails = Object.keys(updateData).map(key => 
+            `${current_user.username} changed ${key} to ${updateData[key]}`
+        );
+
+        console.log("Board Id from card:", card);
+
         if (logDetails.length > 0) {
             const logger = new ActivityLog({
                 action: "Update",
                 entity: "card",
-                entityId: list._id,
+                entityId: card._id,
                 details: logDetails.join("; "),
                 createdBy: req.current_user._id,
-                boardId: list.board,
-                listId: list._id
+                boardId: card.boardId,
+                listId: card.listId
             });
             await logger.save();
         }
-        card.updatedAt = Date.now();
-        await card.save();
-        // emit the event to all connected clients
-        //const io = req.app.get("socketio");
-        //io.to(list.board).emit("updateCard", card);
-        // return a response to the client
+
         return res.status(200).json(card);
+        
     } catch (err) {
+        console.log(err);
         return res.status(500).json({
-            error: `An error occured internally: ${err.message}`
+            error: `An error occurred internally: ${err.message}`
         });
     }
 }

@@ -22,6 +22,10 @@ const CardSchema = new Schema({
         enum: ['pending', 'overdue', 'completed'],
         default: "pending"
     },
+    checked: {
+        type: Boolean,
+        default: false
+    },
     comments: [{
         type: Schema.Types.ObjectId,
         ref: "Comment"
