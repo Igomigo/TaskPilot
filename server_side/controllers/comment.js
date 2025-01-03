@@ -11,9 +11,12 @@ exports.createComment = async (req, res) => {
         const cardId = req.params.cardId;
         const current_user = req.current_user;
         const {text} = req.body
+
         if (!text) {
+            console.log("missing text:", text);
             return res.status(400).json({error: "missing text"});
         }
+
         // create new comment document
         const comment = new Comment({
             text: text,
@@ -21,11 +24,13 @@ exports.createComment = async (req, res) => {
             card: cardId
         });
         await comment.save();
+
         // Update the comments array of the associated card document
         const card = await Card.findByIdAndUpdate(cardId, {
             $push: {comments: comment._id},
             updatedAt: Date.now()
         }, { new: true });
+
         // find the list via the cardId
         const list = await List.findOne({cards: {$in: [cardId]}});
         if (!list) {
@@ -33,11 +38,15 @@ exports.createComment = async (req, res) => {
             console.log('No list found containing the specified cardId');
             return res.status(404).json({message: 'List not found'});
         }
+
+        const commentData = await Comment.findById(comment._id)
+        .populate("createdBy");
+
         // Log the create activity
         const logger = new ActivityLog({
             action: "create",
             entity: "Comment",
-            entityId: comment._id,
+            entityId: commentData._id,
             details: `${current_user.username} on ${card.title}: ${comment.text}`,
             createdBy: current_user._id,
             boardId: list.board,
@@ -46,12 +55,14 @@ exports.createComment = async (req, res) => {
         });
         await logger.save();
         // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(list.board).emit("createComment", comment);
+        // const io = req.app.get("socketio");
+        // io.to(list.board).emit("createComment", comment);
         // return a response to the client
-        return res.status(201).json(comment);
+        return res.status(201).json(commentData);
+
     } catch (err) {
-        console.log(`${err}`);
+        console.log(err);
+
         return res.status(500).json({
             error: `An error occured internally: ${err.message}`
         });
