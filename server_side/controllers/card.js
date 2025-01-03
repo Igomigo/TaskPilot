@@ -114,26 +114,24 @@ exports.updateCard = async (req, res) => {
         const cardId = req.params.cardId;
         const updateData = req.body;
         
-        // Find the card and update only the fields provided in updateData
-        const card = await Card.findByIdAndUpdate(
+        // Check if the card exists before updating
+        const card = await Card.findById(cardId);
+        if (!card) {
+            return res.status(404).json({ error: "Card not found" });
+        }
+
+        // Update the card data
+        if (updateData.checked !== undefined) {
+            updateData.status = updateData.checked ? "completed" : "pending";
+        }
+
+        const updatedCard = await Card.findByIdAndUpdate(
             cardId,
             { $set: updateData },
             { new: true }
         );
 
-        if (updateData.checked === true) {
-            card.status = "completed";
-            await card.save();
-        }
-
-        if (updateData.checked === false) {
-            card.status = "pending";
-            await card.save();
-        }
-
-        const newCard = await Card.findById(cardId);
-
-        if (!newCard) {
+        if (!updatedCard) {
             return res.status(404).json({error: "Card not found"});
         }
 
@@ -148,16 +146,16 @@ exports.updateCard = async (req, res) => {
             const logger = new ActivityLog({
                 action: "Update",
                 entity: "card",
-                entityId: newCard._id,
+                entityId: updatedCard._id,
                 details: logDetails.join("; "),
                 createdBy: req.current_user._id,
-                boardId: newCard.board,
-                listId: newCard.listId
+                boardId: updatedCard.board,
+                listId: updatedCard.listId
             });
             await logger.save();
         }
 
-        return res.status(200).json(newCard);
+        return res.status(200).json(updatedCard);
         
     } catch (err) {
         console.log(err);
