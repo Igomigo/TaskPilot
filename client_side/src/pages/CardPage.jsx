@@ -8,6 +8,7 @@ import { FiCheck } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import useLogout from '../hooks/useLogout';
 import { format, parseISO, formatISO } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const CardPage = () => {
     // Hooks
@@ -48,14 +49,17 @@ const CardPage = () => {
     const handleSubmit = async () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/b/${cardData._id}/update`;
 
-        // Convert date back to original format
-        const dateObject = parseISO(dueDate); // Converts to Date object
-        const originalFormat = formatISO(dateObject); // Converts to ISO 8601 format
+        let originalFormat;
+        if (dueDate) {
+            // Convert date back to original format
+            const dateObject = parseISO(dueDate); // Converts to Date object
+            originalFormat = formatISO(dateObject); // Converts to ISO 8601 format
+        }
 
         const updatedCardData = {
             title,
             description,
-            dueDate: originalFormat,
+            dueDate: dueDate ? originalFormat : "",
             checked: isChecked
         }
 
@@ -81,15 +85,21 @@ const CardPage = () => {
 
             const returnedCardData = await response.json();
 
-            // Format the date to the required format
-            const formattedDate = format(new Date(returnedCardData.dueDate), 'yyyy-MM-dd');
+            console.log("Updated Card Data:", returnedCardData);
+
+            if (returnedCardData.dueDate) {
+                // Format the date to the required format
+                const formattedDate = format(new Date(returnedCardData.dueDate), 'yyyy-MM-dd');
+                setDueDate(formattedDate);
+            }
 
             setTitle(returnedCardData.title);
             setDescription(returnedCardData.description);
             setIsChecked(returnedCardData.checked);
-            setDueDate(formattedDate);
+            toast.success("Card data updated successfully");
 
         } catch (error) {
+            toast.error("Failed to update card data");
             console.log("Error:", error.message);
 
         } finally {
@@ -127,14 +137,16 @@ const CardPage = () => {
                 const cardData = await response.json();
                 console.log(cardData);
 
-                // Format the date to the required format
-                const formattedDate = format(new Date(cardData.dueDate), 'yyyy-MM-dd');
+                if (cardData.dueDate) {
+                    // Format the date to the required format
+                    const formattedDate = format(new Date(cardData.dueDate), 'yyyy-MM-dd');
+                    setDueDate(formattedDate);
+                }
 
                 setCardData(cardData);
                 setTitle(cardData.title);
                 setDescription(cardData.description);
                 setComments(cardData.comments);
-                setDueDate(formattedDate);
                 setIsChecked(cardData.checked);
 
             } catch (error) {
