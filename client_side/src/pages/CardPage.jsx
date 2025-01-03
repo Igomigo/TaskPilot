@@ -26,23 +26,55 @@ const CardPage = () => {
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [saveLoading, setSaveLoading] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false);
 
     const handleCloseModal = () => {
         navigate(-1);
     };
 
-    const handleAddComment = (e) => {
-        // e.preventDefault();
-        // if (comment.trim()) {
-        //     const newComment = {
-        //         id: comments.length + 1,
-        //         author: "Current User",
-        //         text: comment,
-        //         timestamp: new Date().toLocaleString(),
-        //     };
-        //     setComments([...comments, newComment]);
-        //     setComment("");
-        // }
+    // Handle submit comment form
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+
+        if (!comment || comment === "") {
+            return;
+        }
+
+        setCommentLoading(true);
+        try {
+            const url = `${import.meta.env.VITE_BACKEND_URL}/c/${cardData._id}/comment`;
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify({text: comment}),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user?.token}`
+                }
+            });
+
+            if (response.status === 401) {
+                toast.error("Session expired, kindly login again");
+                handleLogout();
+            }
+
+            if (!response.ok) {
+                throw new Error("Error sending new comment");
+            }
+
+            const commentData = await response.json();
+
+            setComments(prev => {
+                return [commentData, ...prev];
+            });
+            
+            setComment("");
+
+        } catch (error) {
+            console.log("Error:", error.message);
+
+        } finally {
+            setCommentLoading(false);
+        }
     };
 
     // Handle submit form
@@ -85,7 +117,7 @@ const CardPage = () => {
 
             const returnedCardData = await response.json();
 
-            console.log("Updated Card Data:", returnedCardData);
+            //console.log("Updated Card Data:", returnedCardData);
 
             if (returnedCardData.dueDate) {
                 // Format the date to the required format
@@ -135,7 +167,7 @@ const CardPage = () => {
                 }
 
                 const cardData = await response.json();
-                console.log(cardData);
+                //console.log(cardData);
 
                 if (cardData.dueDate) {
                     // Format the date to the required format
