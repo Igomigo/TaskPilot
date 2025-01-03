@@ -36,7 +36,7 @@ exports.createCard = async (req, res) => {
 
         const card = new Card({
             title: title,
-            boardId: boardId,
+            board: boardId,
             listId: listId,
             createdBy: current_user._id
         });
@@ -49,6 +49,9 @@ exports.createCard = async (req, res) => {
             },
             {new: true}
         );
+        //console.log("List Data:", list);
+
+        //console.log("Card Data:", savedCard);
 
         // Create the actiivity log
         const logger = new ActivityLog({
@@ -88,6 +91,8 @@ exports.getCard = async (req, res) => {
             }
         });
 
+        //console.log("getCard:", card);
+
         if (!card) {
             return res.status(404).json({error: "card not found"});
         }
@@ -110,14 +115,25 @@ exports.updateCard = async (req, res) => {
         const updateData = req.body;
         
         // Find the card and update only the fields provided in updateData
-        await Card.findByIdAndUpdate(
+        const card = await Card.findByIdAndUpdate(
             cardId,
-            { $set: updateData }
+            { $set: updateData },
+            { new: true }
         );
 
-        const card = await Card.findById(cardId).populate("boardId");
+        if (updateData.checked === true) {
+            card.status = "completed";
+            await card.save();
+        }
 
-        if (!card) {
+        if (updateData.checked === false) {
+            card.status = "pending";
+            await card.save();
+        }
+
+        const newCard = await Card.findById(cardId);
+
+        if (!newCard) {
             return res.status(404).json({error: "Card not found"});
         }
 
@@ -126,22 +142,22 @@ exports.updateCard = async (req, res) => {
             `${current_user.username} changed ${key} to ${updateData[key]}`
         );
 
-        console.log("Board Id from card:", card);
+        //console.log("Board Id from card:", card);
 
         if (logDetails.length > 0) {
             const logger = new ActivityLog({
                 action: "Update",
                 entity: "card",
-                entityId: card._id,
+                entityId: newCard._id,
                 details: logDetails.join("; "),
                 createdBy: req.current_user._id,
-                boardId: card.boardId,
-                listId: card.listId
+                boardId: newCard.board,
+                listId: newCard.listId
             });
             await logger.save();
         }
 
-        return res.status(200).json(card);
+        return res.status(200).json(newCard);
         
     } catch (err) {
         console.log(err);
