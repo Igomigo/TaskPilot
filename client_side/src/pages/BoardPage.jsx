@@ -175,7 +175,7 @@ const BoardPage = () => {
       try {
         const response = await fetch(url, {
           method: "POST",
-          body: JSON.stringify({title: cardTitle, boardId}),
+          body: JSON.stringify({title: cardTitle, boardId: boardId}),
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
@@ -304,7 +304,7 @@ const BoardPage = () => {
     socketConnection.on("overdueCards", overdueCards => {
       console.log(overdueCards);
     });
-    
+
   }, [boardId]);
 
   return (

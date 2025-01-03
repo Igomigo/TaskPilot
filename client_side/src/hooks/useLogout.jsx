@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom"
 import { logout } from '../redux/userSlice'
+import toast from "react-hot-toast";
 
 export default function useLogout() {
     const navigate = useNavigate();
