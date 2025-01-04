@@ -23,13 +23,13 @@ async function checkDeadline() {
 
     // Group overdue cards by board id
     const overdueCardsByBoardId = overdueCards.reduce((acc, card) => {
-        if (!acc[card.boardId]) {
-            acc[card.boardId] = [];
+        if (!acc[card.board]) {
+            acc[card.board] = [];
         }
-        acc[card.boardId].push({
+        acc[card.board].push({
             _id: card._id,
             listId: card.listId,
-            boardId: card.boardId,
+            boardId: card.board,
             status: "overdue"
         });
         return acc;
