@@ -97,6 +97,9 @@ exports.getCard = async (req, res) => {
             return res.status(404).json({error: "card not found"});
         }
 
+        // Sort comments by updatedAt field in descending order
+        card.comments.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
         return res.status(200).json(card);
 
     } catch (err) {
