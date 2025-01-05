@@ -7,7 +7,7 @@ import { FaRegCommentAlt } from "react-icons/fa";
 import { FiCheck } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import useLogout from '../hooks/useLogout';
-import { format, parseISO, formatISO } from 'date-fns';
+import { format, parseISO, formatISO, formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const CardPage = () => {
@@ -175,10 +175,19 @@ const CardPage = () => {
                     setDueDate(formattedDate);
                 }
 
+                // Format comment updatedAt time
+                if (cardData.comments.length > 0) {
+                    cardData.comments.map(comment => {
+                        const parsedDate = parseISO(comment.updatedAt);
+                        comment.updatedAt = formatDistanceToNow(parsedDate, {addSuffix: true});
+                        return comment;
+                    });
+                    setComments(cardData.comments);
+                }
+
                 setCardData(cardData);
                 setTitle(cardData.title);
                 setDescription(cardData.description);
-                setComments(cardData.comments);
                 setIsChecked(cardData.checked);
 
             } catch (error) {
@@ -192,7 +201,7 @@ const CardPage = () => {
 
     return (
         <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center pt-10 px-4 sm:px-6 lg:px-8">
-            <div className="relative bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl transform transition-all">
+            <div className="relative bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mb-3 transform transition-all">
                 <button onClick={handleCloseModal} className="absolute top-3 right-4 text-gray-400 hover:text-white transition-colors duration-200">
                     <MdClose size={24} />
                 </button>
