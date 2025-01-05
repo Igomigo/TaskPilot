@@ -10,6 +10,8 @@ import { useRef } from 'react';
 import { MdGroups } from "react-icons/md";
 import { IoMdArchive } from "react-icons/io";
 import io from "socket.io-client";
+import { LuClock4 } from "react-icons/lu";
+import { FaCheck } from "react-icons/fa6";
 
 // Dummy board data
 // const initialLists = [
@@ -300,9 +302,32 @@ const BoardPage = () => {
     // Emit the join board event
     socketConnection.emit("joinBoard", boardId);
 
-    // Listen for the overdue cards event
+    // Listen for the overdue cards event and update the UI
     socketConnection.on("overdueCards", overdueCards => {
-      console.log(overdueCards);
+      setLists(prev => {
+        const updatedLists = [...prev];
+
+        overdueCards.forEach(overdueCard => {
+          const listIndex = updatedLists.findIndex(list =>
+            list.cards.some(card => card._id === overdueCard._id)
+          );
+
+          if (listIndex != -1) {
+            const cardIndex = updatedLists[listIndex].cards.findIndex(card =>
+              card._id === overdueCard._id
+            );
+
+            if (cardIndex != -1) {
+              updatedLists[listIndex].cards[cardIndex] = {
+                ...updatedLists[listIndex].cards[cardIndex],
+                ...overdueCard
+              };
+            }
+          }
+        });
+
+        return updatedLists;
+      });
     });
 
   }, [boardId]);
@@ -348,6 +373,30 @@ const BoardPage = () => {
                         <Link key={card._id} to={`/b/${list?._id}/${card?.title}`} className='group'>
                           <div className='bg-bg-color text-gray-300 shadow rounded-lg p-3 mb-2 mx-2 border border-transparent transition-colors duration-200 ease-in-out group-hover:border-gray-200'>
                             <p className='text-sm'>{card?.title}</p>
+                            <div className='flex space-x-2 items-center'>
+                              {
+                                card.dueDate ? (
+                                  card.status === "overdue" ? (
+                                    <div title='Overdue' className='flex space-x-2 p-1 rounded-md bg-red-400 w-fit mt-2 text-black'>
+                                        <LuClock4 size={15}/>
+                                        <span className='text-xs'>{card.dueDate}</span>
+                                      </div>
+                                  ) : (
+                                      <div title='Deadline date' className='flex space-x-2 p-1 rounded-md bg-green w-fit mt-2 text-black'>
+                                        <LuClock4 size={15}/>
+                                        <span className='text-xs'>{card.dueDate}</span>
+                                      </div>
+                                    )
+                                ) : ""
+                              }
+                              {
+                                card.status === "completed" && (
+                                  <div title='completed' className='bg-blue-700 p-1 mt-2 rounded-md'>
+                                    <FaCheck size={15}/>
+                                  </div>
+                                )
+                              }
+                            </div>
                           </div>
                         </Link>
                       ))
