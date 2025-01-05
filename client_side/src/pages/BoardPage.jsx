@@ -12,6 +12,7 @@ import { IoMdArchive } from "react-icons/io";
 import io from "socket.io-client";
 import { LuClock4 } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa6";
+import { format } from 'date-fns';
 
 // Dummy board data
 // const initialLists = [
@@ -254,7 +255,22 @@ const BoardPage = () => {
       const boardData = await response.json();
       //console.log(boardData);
       setBoardData(boardData);
-      setLists(boardData.lists);
+      setLists(
+        boardData.lists.map(list => {
+          const updatedCards = list.cards.map((card) => {
+            if (card.dueDate) {
+              return {
+                ...card,
+                dueDate: format(new Date(card.dueDate), 'MMM dd, yyyy')
+              };
+            }
+            return card;
+          });
+          return {...list, cards: updatedCards}
+        })
+      );
+
+      console.log("All Lists:", lists);
 
     } catch (error) {
       console.log("Error", error.message);
@@ -318,8 +334,16 @@ const BoardPage = () => {
             );
 
             if (cardIndex != -1) {
+              const existingCard = updatedLists[listIndex].cards[cardIndex];
+
+              // Format the existing card's dueDate
+              if (existingCard.dueDate) {
+                existingCard.dueDate = format(new Date(existingCard.dueDate), 'MMM dd, yyyy');
+              }
+
+              // Update the card with data from the server
               updatedLists[listIndex].cards[cardIndex] = {
-                ...updatedLists[listIndex].cards[cardIndex],
+                ...existingCard,
                 ...overdueCard
               };
             }
@@ -377,12 +401,12 @@ const BoardPage = () => {
                               {
                                 card.dueDate ? (
                                   card.status === "overdue" ? (
-                                    <div title='Overdue' className='flex space-x-2 p-1 rounded-md bg-red-400 w-fit mt-2 text-black'>
+                                    <div title='Overdue' className='flex space-x-1 px-2 py-1 rounded-md bg-red-400 w-fit mt-2 text-black'>
                                         <LuClock4 size={15}/>
                                         <span className='text-xs'>{card.dueDate}</span>
                                       </div>
                                   ) : (
-                                      <div title='Deadline date' className='flex space-x-2 p-1 rounded-md bg-green w-fit mt-2 text-black'>
+                                      <div title='Deadline date' className='flex space-x-1 px-2 py-1 rounded-md bg-green w-fit mt-2 text-black'>
                                         <LuClock4 size={15}/>
                                         <span className='text-xs'>{card.dueDate}</span>
                                       </div>
