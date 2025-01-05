@@ -354,6 +354,22 @@ const BoardPage = () => {
       });
     });
 
+    // Listen for the newCard event and update the UI
+    socketConnection.on("newCard", newCard => {
+      // Update the respective list's card array with the new card
+      setLists(prev => {
+        const updatedLists = [...prev];
+        updatedLists.map(list => {
+          if (list._id === newCard.listId) {
+            updatedCards = list.cards.push(newCard);
+            return {...list, cards: updatedCards}
+          }
+          return list;
+        });
+        return updatedLists;
+      });
+    });
+
   }, [boardId]);
 
   return (
