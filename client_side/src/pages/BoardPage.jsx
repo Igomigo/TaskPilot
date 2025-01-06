@@ -356,6 +356,7 @@ const BoardPage = () => {
 
     // Listen for the newCard event and update the UI
     socketConnection.on("newCard", newCard => {
+      console.log("New card event received:", newCard);
       // Update the respective list's card array with the new card
       setLists(prev => {
         const updatedLists = [...prev];
