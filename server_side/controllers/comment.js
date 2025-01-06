@@ -4,6 +4,7 @@ const Comment = require("../models/comment");
 const Card = require("../models/card");
 const List = require("../models/list");
 const ActivityLog = require("../models/activityLog");
+const { getIo } = require("../socket/io");
 
 exports.createComment = async (req, res) => {
     // Create a new comment
@@ -54,9 +55,11 @@ exports.createComment = async (req, res) => {
             cardId: cardId
         });
         await logger.save();
-        // emit the event to all connected clients
-        // const io = req.app.get("socketio");
-        // io.to(list.board).emit("createComment", comment);
+        
+        // Emit the event to all connected clients
+        io = getIo();
+        io.to(list.board.toString()).emit("newComment", comment);
+        
         // return a response to the client
         return res.status(201).json(commentData);
 

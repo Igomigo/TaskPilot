@@ -6,6 +6,7 @@ const List = require("../models/list");
 const Board = require("../models/board");
 const Comment = require("../models/comment");
 const ActivityLog = require("../models/activityLog");
+const { getIo } = require("../socket/io");
 
 
 exports.createCard = async (req, res) => {
@@ -65,6 +66,12 @@ exports.createCard = async (req, res) => {
             cardId: card._id
         });
         await logger.save();
+
+        // Emit to all connected clients
+        const io = getIo();
+
+        console.log(`Emitting newCard event for board ${list.board}:`, savedCard);
+        io.to(list.board).emit("newCard", savedCard);
 
         // return a response to the client
         return res.status(201).json(savedCard);

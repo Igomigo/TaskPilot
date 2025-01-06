@@ -17,6 +17,7 @@ const cardRoute = require("./routes/cardRoute");
 const commentRoute = require("./routes/commentRoute");
 const logRoute = require("./routes/activityLogRoutes");
 const setupSocketServer = require("./socket/index");
+const { setIo } = require("./socket/io");
 
 // Initialize the express app
 const app = express();
@@ -51,6 +52,9 @@ app.get("/ping", authWare, (req, res) => {
     res.status(200).json("Server says pong");
     console.log("Pong");
 });
+
+// Set the io instance
+setIo(io);
 
 // Call the socket connection
 setupSocketServer(io);
