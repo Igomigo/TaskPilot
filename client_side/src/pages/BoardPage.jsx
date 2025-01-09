@@ -14,6 +14,7 @@ import { LuClock4 } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa6";
 import { format } from 'date-fns';
 import { setSocketConnection } from '../redux/userSlice';
+import Loading from '../components/loading';
 
 // Dummy board data
 // const initialLists = [
@@ -79,6 +80,7 @@ const BoardPage = () => {
   const [newCard, setNewCard] = useState();
   const [listLoading, setlistLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
   const [showActivityModal, setShowActivityModal] = useState(false);
 
   // Handle on change event for a new list
@@ -93,7 +95,9 @@ const BoardPage = () => {
   // Handle Submit Form for a new list
   const handleSubmitList = async (e) => {
     e.preventDefault();
-    const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}/list`;
+
+    setlistLoading(true);
+    //const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}/list`;
 
     if (newList.title === "") {
       return;
@@ -101,54 +105,66 @@ const BoardPage = () => {
 
     const listData = {
       ...newList,
-      position: lists.length + 1
+      position: lists.length + 1,
+      boardId: boardId,
     }
 
-    const token = user?.token;
+    const socketConnection = user?.socketConnection;
 
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    // Emit the new list event
+    socketConnection.emit("newList", listData);
+    // Clear the input field
+    e.target.reset();
+    // Reset the newList state
+    setNewList({title: "", position: 0});
+    // Close the show list modal
+    setShowList(false);
 
-    setlistLoading(true);
+    // const token = user?.token;
 
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify(listData),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      });
+    // if (!token) {
+    //   navigate("/login");
+    //   return;
+    // }
 
-      if (response.status === 401) {
-        // Token is invalid or expired, redirect to login
-        toast.error("Session expired, redirecting to login");
-        handleLogout();
-      }
+    // setlistLoading(true);
 
-      if (!response.ok) {
-        throw new Error("An error occured");
-      }
+    // try {
+    //   const response = await fetch(url, {
+    //     method: "POST",
+    //     body: JSON.stringify(listData),
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "Authorization": `Bearer ${token}`
+    //     }
+    //   });
 
-      const data = await response.json();
-      //console.log(data);
-      setLists(prev => [
-        ...prev,
-        data
-      ]);
+    //   if (response.status === 401) {
+    //     // Token is invalid or expired, redirect to login
+    //     toast.error("Session expired, redirecting to login");
+    //     handleLogout();
+    //   }
 
-      setNewList("");
-      setShowList(false);
+    //   if (!response.ok) {
+    //     throw new Error("An error occured");
+    //   }
 
-    } catch (error) {
-      console.log("Error:", error.message);
+    //   const data = await response.json();
+    //   //console.log(data);
+    //   setLists(prev => [
+    //     ...prev,
+    //     data
+    //   ]);
 
-    } finally {
-      setlistLoading(false);
-    }
+    //   setNewList("");
+    //   setShowList(false);
+
+    // } catch (error) {
+    //   console.log("Error:", error.message);
+
+    // } finally {
+    //   setlistLoading(false);
+    // }
   }
 
   // Toggle between card states
@@ -162,6 +178,8 @@ const BoardPage = () => {
   // Handle submit card
   const handleSubmitCard = async (e, listId) => {
     e.preventDefault();
+
+    setCardLoading(true);
 
     const cardTitle = e.target.cardTitle.value;
 
@@ -177,6 +195,7 @@ const BoardPage = () => {
       socketConnection.emit("newCard", newCard);
       // Clear the input field
       e.target.reset();
+      setCardLoading(false);
       // Hide the card input form
       toggleCardInputState(listId);
     }
@@ -252,6 +271,8 @@ const BoardPage = () => {
       return;
     }
 
+    setPageLoading(true);
+
     try {
       const response = await fetch(url, {
         method: "GET",
@@ -293,6 +314,9 @@ const BoardPage = () => {
 
     } catch (error) {
       console.log("Error", error.message);
+
+    } finally {
+      setPageLoading(false);
     }
   }
 
@@ -378,6 +402,19 @@ const BoardPage = () => {
       });
     });
 
+    socketConnection.on("createdList", newList => {
+      if (newList) {
+        setLists(prev => {
+          // Check is list already exists
+          const listExists = prev.some((list) => list._id === newList._id);
+          if (!listExists) {
+            return [...prev, newList]
+          }
+          return prev;
+        });
+      }
+    });
+
     // Listen for the newCard event and update the UI
     socketConnection.on("cardCreated", newCard => {
       console.log("New card event received successfully:", newCard);
@@ -400,7 +437,20 @@ const BoardPage = () => {
       toast.error(message);
     });
 
-  }, [boardId]);
+    return () => {
+      console.log("Cleaning up socket listeners");
+      socketConnection.off("cardCreated");
+      socketConnection.off("createdList");
+      socketConnection.off("overdueCards");
+      socketConnection.off("alreadyExists");
+      socketConnection.off("Auth_error");
+      socketConnection.emit("leaveBoard", boardId);
+      socketConnection.disconnect();
+    };
+
+  }, [boardId, dispatch]);
+
+  if (pageLoading) return <div className='h-full flex items-center justify-center'><Loading /></div>
 
   return (
     <div className='h-screen overflow-hidden'>
