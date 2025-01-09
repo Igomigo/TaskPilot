@@ -70,7 +70,7 @@ exports.createCard = async (req, res) => {
         // Emit to all connected clients
         const io = getIo();
 
-        console.log(`Emitting newCard event for board ${list.board}:`, savedCard);
+        //console.log(`Emitting newCard event for board ${list.board}:`, savedCard);
         io.to(list.board).emit("newCard", savedCard);
 
         // return a response to the client

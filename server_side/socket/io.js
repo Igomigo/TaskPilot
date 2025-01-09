@@ -7,6 +7,7 @@ function setIo(ioInstance) {
 
 function getIo() {
     if (!io) {
+        console.log("Socket.io instance has not been initialized");
         throw new Error("Socket.io instance has not been initialized");
     }
     return io;
