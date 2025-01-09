@@ -13,6 +13,7 @@ import io from "socket.io-client";
 import { LuClock4 } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa6";
 import { format } from 'date-fns';
+import { setSocketConnection } from '../redux/userSlice';
 
 // Dummy board data
 // const initialLists = [
@@ -161,64 +162,82 @@ const BoardPage = () => {
   // Handle submit card
   const handleSubmitCard = async (e, listId) => {
     e.preventDefault();
+
     const cardTitle = e.target.cardTitle.value;
-    if (cardTitle.trim()) {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/b/${listId}/card`;
 
-      const token = user?.token;
+    const newCard = {
+      title: cardTitle,
+      boardId: boardId,
+      listId: listId
+    };
 
-      if (!token) {
-        console.warn("No token available; redirecting to login.");
-        navigate("/login");
-        return;
-      }
+    const socketConnection = user?.socketConnection;
 
-      setCardLoading(true);
-
-      try {
-        const response = await fetch(url, {
-          method: "POST",
-          body: JSON.stringify({title: cardTitle, boardId: boardId}),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          }
-        });
-
-        if (response.status === 401) {
-          // Token is invalid or expired, redirect to login
-          toast.error("Session expired, redirecting to login");
-          handleLogout();
-        }
-
-        if (response.status === 409) {
-          toast.error("Card already exists in this list");
-          setShowCardInputs(false);
-        }
-
-        if (!response.ok) {
-          throw new Error("An error occured");
-        }
-
-        const newCard = await response.json();
-
-        // Update the respective list's card array with the new card
-        setLists(prev => 
-          prev.map(list => 
-            list._id === listId ? {...list, cards: [...list.cards, newCard]} : list
-          )
-        );
-
-        e.target.reset();
-        toggleCardInputState(listId);
-
-      } catch (error) {
-        console.log("Error:", error.message);
-
-      } finally {
-        setCardLoading(false);
-      }
+    if (socketConnection && newCard.listId && newCard.title && newCard.boardId) {
+      socketConnection.emit("newCard", newCard);
+      // Clear the input field
+      e.target.reset();
+      // Hide the card input form
+      toggleCardInputState(listId);
     }
+
+    // if (cardTitle.trim()) {
+    //   const url = `${import.meta.env.VITE_BACKEND_URL}/b/${listId}/card`;
+
+    //   const token = user?.token;
+
+    //   if (!token) {
+    //     console.warn("No token available; redirecting to login.");
+    //     navigate("/login");
+    //     return;
+    //   }
+
+    //  setCardLoading(true);
+
+      // try {
+      //   const response = await fetch(url, {
+      //     method: "POST",
+      //     body: JSON.stringify({title: cardTitle, boardId: boardId}),
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       "Authorization": `Bearer ${token}`
+      //     }
+      //   });
+
+      //   if (response.status === 401) {
+      //     // Token is invalid or expired, redirect to login
+      //     toast.error("Session expired, redirecting to login");
+      //     handleLogout();
+      //   }
+
+      //   if (response.status === 409) {
+      //     toast.error("Card already exists in this list");
+      //     setShowCardInputs(false);
+      //   }
+
+      //   if (!response.ok) {
+      //     throw new Error("An error occured");
+      //   }
+
+      //   const newCard = await response.json();
+
+      //   // Update the respective list's card array with the new card
+      //   setLists(prev => 
+      //     prev.map(list => 
+      //       list._id === listId ? {...list, cards: [...list.cards, newCard]} : list
+      //     )
+      //   );
+
+      //   e.target.reset();
+      //   toggleCardInputState(listId);
+
+      // } catch (error) {
+      //   console.log("Error:", error.message);
+
+      // } finally {
+      //   setCardLoading(false);
+      // }
+    //}
   }
 
   // Fetch board data
@@ -308,10 +327,15 @@ const BoardPage = () => {
       }
     });
 
+    if (socketConnection) {
+      dispatch(setSocketConnection(socketConnection));
+    }
+
     //console.log("Socket connection:", socketConnection);
 
+    // Listen for the auth error event
     socketConnection.on("Auth_error", data => {
-      toast.error()
+      toast.error("Session expired, kindly log in again");
       handleLogout();
     });
 
@@ -355,20 +379,25 @@ const BoardPage = () => {
     });
 
     // Listen for the newCard event and update the UI
-    socketConnection.on("newCard", newCard => {
-      console.log("New card event received:", newCard);
+    socketConnection.on("cardCreated", newCard => {
+      console.log("New card event received successfully:", newCard);
       // Update the respective list's card array with the new card
-      setLists(prev => {
-        const updatedLists = [...prev];
-        updatedLists.map(list => {
-          if (list._id === newCard.listId) {
-            updatedCards = list.cards.push(newCard);
-            return {...list, cards: updatedCards}
-          }
-          return list;
-        });
-        return updatedLists;
-      });
+        setLists(prev => 
+        prev.map(list => 
+          list._id === newCard?.listId 
+            ? {...list, cards: list.cards.some(card => card._id === newCard._id) 
+                ? list.cards 
+                : [...list.cards, newCard]
+              } 
+            : list
+        )
+      );
+    });
+
+    // Listen for the card already exists event
+    socketConnection.on("alreadyExists", message => {
+      console.log("Already exists event triggered");
+      toast.error(message);
     });
 
   }, [boardId]);
