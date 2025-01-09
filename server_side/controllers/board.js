@@ -8,6 +8,7 @@ const List = require("../models/list");
 const Card = require("../models/card");
 const Comment = require("../models/comment");
 const ActivityLog = require("../models/activityLog");
+const Member = require("../models/member");
 
 exports.createBoard = async (req, res) => {
     // Creates a new board
@@ -26,6 +27,15 @@ exports.createBoard = async (req, res) => {
             members: current_user._id
         });
         await board.save();
+
+        // Create the board member data for this user
+        const member = new Member({
+            board: board._id,
+            role: "admin",
+            user: current_user._id
+        });
+        await member.save();
+
         // Populate the activity log
         const logger = new ActivityLog({
             action: "create",
