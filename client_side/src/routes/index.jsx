@@ -10,6 +10,7 @@ import Layout from "../layout/Layout";
 import NotificationsPage from "../pages/NotificationsPage";
 import ActivityLogPage from "../pages/ActivityLogPage";
 import CardPage from "../pages/CardPage";
+import BoardMembersPage from "../pages/BoardMembersPage";
 
 const router = createBrowserRouter([{
     path: "/",
@@ -30,6 +31,10 @@ const router = createBrowserRouter([{
                 {
                     path: "b/:listId/:cardTitle",
                     element: <CardPage />
+                },
+                {
+                    path: "b/:boardId/members",
+                    element: <BoardMembersPage />
                 },
                 {
                     path: "profile/:username",
