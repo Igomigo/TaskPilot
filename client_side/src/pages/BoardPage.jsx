@@ -462,10 +462,10 @@ const BoardPage = () => {
         {
           showActivityModal && (
             <div className='absolute text-sm border border-slate-700 right-0 mr-6 top-0 px-2 py-4 w-fit mt-11 rounded-md bg-form-bg h-fit text-white'>
-              <div className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
+              <Link to={`/b/${boardId}/members`} className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
                 <MdGroups className='mr-3' size={23}/>
                 <button>Board members</button>
-              </div>
+              </Link>
               <div className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
                 <IoMdArchive className='mr-3' size={23}/>
                 <button>Archive this board</button>

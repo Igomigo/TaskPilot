@@ -18,9 +18,14 @@ const BoardSchema = new Schema({
         required: true,
         index: true
     },
+    admins: [{
+        type: Schema.Types.ObjectId,
+        ref: "Member",
+        required: true
+    }],
     members: [{
         type: Schema.Types.ObjectId,
-        ref: "User"
+        ref: "Member"
     }],
     lists: [{
         type: Schema.Types.ObjectId,
