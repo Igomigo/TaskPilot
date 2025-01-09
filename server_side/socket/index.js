@@ -99,6 +99,41 @@ function setupSocketServer(io) {
             }
         });
 
+        // Handle the new list event
+        socket.on("newList", async (list) => {
+            if (list) {
+                const newList = new List({
+                    title: list.title,
+                    position: list.position,
+                    board: list.boardId,
+                    createdBy: socket.current_user._id
+                });
+                const savedList = await newList.save();
+        
+                // update the board accordingly
+                await Board.findByIdAndUpdate(list.boardId,
+                    {$push: {"lists": savedList._id},
+                    updatedAt: Date.now( )},
+                    {new: true}
+                );
+        
+                // Log the change
+                const logger = new ActivityLog({
+                    action: "create",
+                    entity: "List",
+                    entityId: savedList._id,
+                    details: `${socket.current_user.username} created the list: ${savedList.title}`,
+                    createdBy: socket.current_user._id,
+                    boardId: list.boardId,
+                    listId: savedList._id
+                });
+                await logger.save();
+
+                // Emit the list created event to the client
+                io.to(list.boardId).emit("createdList", savedList);
+            }
+        });
+
         // Leave board event
         socket.on("leaveBoard", (boardId) => {
             socket.leave(boardId);
