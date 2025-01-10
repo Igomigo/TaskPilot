@@ -6,6 +6,7 @@ import { MdSpaceDashboard } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
 import { IoSettingsSharp } from "react-icons/io5";
 import { RxActivityLog } from "react-icons/rx";
+import Loading from './loading';
 
 const Sidebar = ({ showSidebar, toggleSidebar, boards }) => {
     // Hooks
@@ -23,14 +24,6 @@ const Sidebar = ({ showSidebar, toggleSidebar, boards }) => {
 
         extractLastFiveBoards();
     }, [boards]);
-
-    /** const Boards = [
-        {name: "Software Team plan", id: "1"},
-        {name: "Content Team", id: "2"},
-        {name: "Team Progress, Marketing", id: "3"},
-        {name: "NNPC Engineers plan", id: "4"},
-        {name: "Collaborapay Frontend Plan", id: "5"}
-    ] */
 
     return (
         <aside className={

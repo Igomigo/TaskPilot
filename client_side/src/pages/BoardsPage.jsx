@@ -6,6 +6,7 @@ import useLogout from '../hooks/useLogout';
 import { formatDistanceToNow } from 'date-fns';
 import Avatar from '../components/Avatar';
 import CreateBoard from '../components/CreateBoard';
+import Loading from '../components/loading';
 
 const BoardsPage = () => {
   // Hooks
@@ -18,6 +19,7 @@ const BoardsPage = () => {
   const [boards, setBoards] = useState([]);
   const [members, setMembers] = useState([]);
   const [createBoard, setCreateBoard] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
 
   // Update the boards from the create board component
   const updateBoardsFunction = (newBoard) => {
@@ -32,6 +34,7 @@ const BoardsPage = () => {
   useEffect(() => {
     // Function that retrieves all boards data for the current user
     const getBoards = async () => {
+      setPageLoading(true);
       const url = `${import.meta.env.VITE_BACKEND_URL}/b`;
 
       const token = localStorage.getItem("token");
@@ -75,6 +78,9 @@ const BoardsPage = () => {
 
       } catch (error) {
         console.log("Error:", error);
+        
+      } finally {
+        setPageLoading(false);
       }
     }
 
@@ -87,6 +93,8 @@ const BoardsPage = () => {
   const handleOnclose = () => {
     setCreateBoard(false);
   }
+
+  if (pageLoading) return <div className='h-full flex items-center justify-center'><Loading /></div>
 
   return (
     <main className='flex-1 relative mb-5 overflow-auto py-2 px-4'>
