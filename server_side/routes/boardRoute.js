@@ -3,6 +3,7 @@
 const board = require("../controllers/board");
 const authWare = require("../middlewares/authWare");
 const permission = require("../middlewares/boardPermissions");
+const members = require("../controllers/member");
 const express = require("express");
 const router = express.Router();
 
@@ -31,8 +32,8 @@ router.get("/:boardId", authWare, permission.permitUser, board.getBoardById);
 router.put("/update/:id", authWare, board.updateBoard);
 
 /**
- * POST request top add a user to the board
- * url: http://localhost:3000/b/addmember/:boardId
+ * POST request to add a user to the board
+ * url: http://localhost:3000/b/:boardId/addmember
  */
 router.post(
     "/:boardId/add-member", authWare,
@@ -40,11 +41,17 @@ router.post(
 );
 
 /**
+ * GET request to retrieve all members for a board
+ * url: http://localhost:3000/b/:boardId/members
+ */
+router.get("/:boardId/members", authWare, members.getBoardMembers);
+
+/**
  * DELETE request to remove a user from the board
- * url: http://localhost:3000/b/:boardId/removemember/:userId
+ * url: http://localhost:3000/b/:boardId/:userId
  */
 router.delete(
-    "/:boardId/delete-member/:userId", authWare,
+    "/:boardId/:userId", authWare,
     permission.addRemDelPermission, board.removeMember
 );
 
