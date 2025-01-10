@@ -210,7 +210,7 @@ exports.addMember = async (req, res) => {
         await logger.save();
 
         // return a response to the client
-        return res.status(200).json(board);
+        return res.status(200).json(member);
 
     } catch (err) {
         console.log(`${err}`);

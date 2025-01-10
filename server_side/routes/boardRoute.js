@@ -33,7 +33,7 @@ router.put("/update/:id", authWare, board.updateBoard);
 
 /**
  * POST request to add a user to the board
- * url: http://localhost:3000/b/:boardId/addmember
+ * url: http://localhost:3000/b/:boardId/add-member
  */
 router.post(
     "/:boardId/add-member", authWare,

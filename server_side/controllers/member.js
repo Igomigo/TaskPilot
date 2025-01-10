@@ -22,7 +22,7 @@ exports.getBoardMembers = async (req, res) => {
         }).populate("user");
 
         // Return a response to the client
-        return response.status(200).json(members);
+        return res.status(200).json(members);
 
     } catch (error) {
         console.log("Error retrieving members data:", error.message);
