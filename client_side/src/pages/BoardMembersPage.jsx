@@ -104,10 +104,59 @@ const BoardMembersPage = () => {
     // State Management
     const [members, setMembers] = useState(mockMembers);
     const [membersLoading, setMembersLoading] = useState(true);
+    const [addMemberLoading, setAddMemberLoading] = useState(false);
+    const [username, setUsername] = useState("");
 
     // Navigate the user to the previous route
     const navigateBack = () => {
         navigate(-1);
+    }
+
+    // Add a new member to the board
+    const addMember = async () => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}/add-member`;
+
+        setAddMemberLoading(true);
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify({username}),
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user?.token}`
+                }
+            });
+
+            if (response.status === 401) {
+                logout();
+            }
+
+            if (response.status === 409) {
+                toast.success(`${username} is already a member of this board`);
+            }
+
+            if (!response.ok) {
+                throw new Error("Error adding a new member to the board");
+            }
+
+            const newMember = await response.json();
+
+            // Update state
+            setUsername("");
+
+            setMembers(prev => {
+                const updatedMembersArray = [...prev];
+                return [...updatedMembersArray, newMember];
+            });
+
+            toast.success(`${username} has been added to the board`);
+            
+        } catch (error) {
+            console.log("Error:", error.message);
+        } finally {
+            setAddMemberLoading(false);
+        }
     }
 
     // Fetch board members data
@@ -149,6 +198,9 @@ const BoardMembersPage = () => {
                 setMembersLoading(false);
             }
         }
+
+        getMembers();
+
     }, [user, boardId]);
 
     return (
@@ -168,6 +220,8 @@ const BoardMembersPage = () => {
                             <div className='relative'>
                                 <input
                                     type='text'
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                     placeholder='Search by username...'
                                     className='w-full rounded-lg py-2 pl-10 text-white pr-4 bg-input-bg focus:outline-none focus:ring-2 focus:ring-blue-500'
                                 />
@@ -176,12 +230,16 @@ const BoardMembersPage = () => {
                         </div>
                         <button className='px-4 hidden md:flex lg:flex space-x-2 items-center transition duration-200 rounded-lg py-2 text-white text-sm bg-blue-600 hover:bg-blue-700'>
                             <FiUserPlus />
-                            <span>Add member</span>
+                            <span>
+                                {addMemberLoading ? "Adding..." : "Add member"}
+                            </span>
                         </button>
                     </div>
                     <button className='lg:hidden md:hidden mt-2 px-4 flex space-x-2 items-center transition duration-200 rounded-lg py-2 text-white text-sm bg-blue-600 hover:bg-blue-700'>
                         <FiUserPlus />
-                        <span>Add member</span>
+                        <span>
+                            {addMemberLoading ? "Adding..." : "Add member"}
+                        </span>
                     </button>
                 </div>
 
