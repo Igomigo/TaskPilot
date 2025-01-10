@@ -288,6 +288,11 @@ const BoardPage = () => {
         handleLogout();
       }
 
+      if (response.status === 403) {
+        toast.error("You are not a member of this board, sneaky you...");
+        navigate("/");
+      }
+
       if (!response.ok) {
         throw new Error("An Unknown error occured");
       }

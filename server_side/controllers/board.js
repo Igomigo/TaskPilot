@@ -101,15 +101,16 @@ exports.getBoardById = async (req, res) => {
             return res.status(404).json({});
         }
 
-        // // Check if the current user is authorized to see rthis board
-        // if (!board.members.includes(current_user._id)) {
-        //     return res.status(403).json({
-        //         error: "You're not authorized to see this board"
-        //     });
-        // }
+        // Check if the current user is authorized to see this board
+        if (!board.members.includes(current_user._id)) {
+            return res.status(403).json({
+                error: "You're not a member of this board"
+            });
+        }
 
         // Return a response back to the client
         return res.status(200).json(board);
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({
@@ -207,7 +208,7 @@ exports.addMember = async (req, res) => {
         });
 
         await logger.save();
-        
+
         // return a response to the client
         return res.status(200).json(board);
 

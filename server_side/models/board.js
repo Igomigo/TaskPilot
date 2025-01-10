@@ -20,12 +20,12 @@ const BoardSchema = new Schema({
     },
     admins: [{
         type: Schema.Types.ObjectId,
-        ref: "Member",
+        ref: "User",
         required: true
     }],
     members: [{
         type: Schema.Types.ObjectId,
-        ref: "Member"
+        ref: "User"
     }],
     lists: [{
         type: Schema.Types.ObjectId,

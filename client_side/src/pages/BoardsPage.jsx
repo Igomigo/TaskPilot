@@ -66,7 +66,7 @@ const BoardsPage = () => {
         }
 
         const boardsData = await response.json();
-        //console.log("Boards Page response:", boardsData);
+        console.log("Boards Page response:", boardsData);
 
         // Convert the updatedAt time to relative format
         const transformedBoards = boardsData?.map((board) => ({
@@ -78,7 +78,7 @@ const BoardsPage = () => {
 
       } catch (error) {
         console.log("Error:", error);
-        
+
       } finally {
         setPageLoading(false);
       }
