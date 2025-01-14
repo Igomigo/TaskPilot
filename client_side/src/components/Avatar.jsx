@@ -3,12 +3,15 @@ import { FaRegUser } from "react-icons/fa6";
 
 const Avatar = ({ imageUrl, userId, username, width, height }) => {
     // Split the name to retrieve the initials
-    const splitName = username?.split(" ");
-    let name;
+    const splitName = username?.split(" ") || [];
+    //console.log(splitName);
+    let name = "";
+
     if (splitName.length > 1) {
-        name = splitName[0][0] + splitName[1][0];
-    } else {
-        name = splitName[0][0];
+        // Use optional chaining to safely access array elements
+        name = (splitName[0]?.[0] || "") + (splitName[1]?.[0] || "");
+    } else if (splitName.length === 1) {
+        name = splitName[0]?.[0] || "";
     }
 
     const bgColors = [

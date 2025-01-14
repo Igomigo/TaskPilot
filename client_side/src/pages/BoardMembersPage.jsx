@@ -6,6 +6,7 @@ import Avatar from '../components/Avatar';
 import { useSelector } from 'react-redux';
 import Loading from '../components/loading';
 import useLogout from '../hooks/useLogout';
+import toast from 'react-hot-toast';
 
 const mockMembers = [
     {
@@ -116,6 +117,10 @@ const BoardMembersPage = () => {
     const addMember = async () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}/add-member`;
 
+        if (!username || username === "") {
+            return;
+        }
+
         setAddMemberLoading(true);
 
         try {
@@ -191,6 +196,9 @@ const BoardMembersPage = () => {
                 const members = await response.json();
                 console.log("Members:", members);
 
+                // Update the members state
+                setMembers(members);
+
             } catch (error) {
                 console.log("An error occured:", error.message);
 
@@ -228,14 +236,14 @@ const BoardMembersPage = () => {
                                 <FiSearch className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'/>
                             </div>
                         </div>
-                        <button className='px-4 hidden md:flex lg:flex space-x-2 items-center transition duration-200 rounded-lg py-2 text-white text-sm bg-blue-600 hover:bg-blue-700'>
+                        <button onClick={addMember} className='px-4 hidden md:flex lg:flex space-x-2 items-center transition duration-200 rounded-lg py-2 text-white text-sm bg-blue-600 hover:bg-blue-700'>
                             <FiUserPlus />
                             <span>
                                 {addMemberLoading ? "Adding..." : "Add member"}
                             </span>
                         </button>
                     </div>
-                    <button className='lg:hidden md:hidden mt-2 px-4 flex space-x-2 items-center transition duration-200 rounded-lg py-2 text-white text-sm bg-blue-600 hover:bg-blue-700'>
+                    <button onClick={addMember} className='lg:hidden md:hidden mt-2 px-4 flex space-x-2 items-center transition duration-200 rounded-lg py-2 text-white text-sm bg-blue-600 hover:bg-blue-700'>
                         <FiUserPlus />
                         <span>
                             {addMemberLoading ? "Adding..." : "Add member"}
@@ -254,13 +262,15 @@ const BoardMembersPage = () => {
                                     <div key={member._id} className='p-3 bg-form-bg shadow-lg rounded-lg'>
                                         <div className='flex justify-between'>
                                             <div className='flex items-center space-x-3'>
-                                                <Avatar
-                                                    imageUrl={member?.user?.profile_pic}
-                                                    userId={member?.user?._id}
-                                                    username={member?.user?.username}
-                                                    width={50}
-                                                    height={50}
-                                                />
+                                                {member?.user && (
+                                                    <Avatar
+                                                        imageUrl={member?.user?.profile_pic}
+                                                        userId={member?.user?._id}
+                                                        username={member?.user?.username}
+                                                        width={50}
+                                                        height={50}
+                                                    />
+                                                )}
                                                 <div className='flex flex-col space-y-2'>
                                                     <h3 className='font-bold text-white'>{member?.user?.username}</h3>
                                                     <p className='text-gray-400 text-xs md:text-sm lg:text-sm'>{member?.user?.email}</p>
@@ -271,11 +281,11 @@ const BoardMembersPage = () => {
                                             </div>
                                             <div className='flex space-x-2'>
                                                 <button className="text-red-500 hover:text-red-600 p-2 h-fit w-fit rounded-full hover:bg-red-100 hover:bg-opacity-20 transition duration-200">
-                                                    <FiUserMinus size={20} />
+                                                    <FiUserMinus title='remove member' size={20} />
                                                 </button>
                                                 {member.role !== "admin" && (
                                                     <button className="text-green hover:text-emerald-600 p-2 h-fit w-fit rounded-full hover:bg-emerald-100 hover:bg-opacity-20 transition duration-200">
-                                                        <FiUserCheck size={20} />
+                                                        <FiUserCheck title='make admin' size={20} />
                                                     </button>
                                                 )}
                                             </div>
