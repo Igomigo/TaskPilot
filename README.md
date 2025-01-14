@@ -15,11 +15,11 @@ TaskPilot is a robust and intuitive task management application built with Node.
 ## Technologies Used
 
 - **Backend:** Node.js, Express.js, MongoDB with Mongoose
-- **Frontend:** HTML, CSS, JavaScript, Bootstrap
+- **Frontend:** HTML, CSS, React, TailwindCSS
 - **Real-time Updates:** Socket.io
 - **Queue Management:** Bull for handling background jobs
 - **Security:** JWT for authentication, bcrypt for password hashing
-- **Deployment:** Docker, AWS/Azure/GCP for cloud deployment
+- **Deployment:** vercel/client, render/server, AWS/Azure/GCP for cloud deployment
 
 ## Getting Started
 
