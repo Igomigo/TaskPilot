@@ -240,13 +240,15 @@ exports.removeMember = async (req, res) => {
             return res.status(404).json({error: "Board not found"});
         }
 
-        const userIndex = board.members.indexOf(userId);
+        // // Check if user is a member of the board
+        // if (!board.members.includes(userId)) {
+        //     return res.status(404).json({
+        //         error: "User not a member of the board"
+        //     });
+        // }
 
-        if (userIndex === -1) {
-            return res.status(400).json({
-                error: "User not a member of the board"
-            });
-        }
+        // Find the index of the user in the members array
+        const userIndex = board.members.findIndex(userId);
 
         // remove user from the board
         board.members.splice(userIndex, 1);
