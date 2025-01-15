@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { PiDotsThreeOutlineVerticalFill } from "react-icons/pi";
 import { PiDotsThreeVertical } from "react-icons/pi";
-import { Link, useNavigate, useNavigation, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FaPlus } from "react-icons/fa6";
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import useLogout from '../hooks/useLogout';
 import { useRef } from 'react';
-import { MdGroups } from "react-icons/md";
+import { MdGroups, MdDeleteSweep, MdClose } from "react-icons/md";
 import { IoMdArchive } from "react-icons/io";
 import io from "socket.io-client";
 import { LuClock4 } from "react-icons/lu";
@@ -82,6 +82,7 @@ const BoardPage = () => {
   const [cardLoading, setCardLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
   const [showActivityModal, setShowActivityModal] = useState(false);
+  const [showDeleteBoardModal, setShowDeleteBoardModal] = useState(false);
 
   // Handle on change event for a new list
   const handleOnchangeForNewList = (e) => {
@@ -325,6 +326,17 @@ const BoardPage = () => {
     }
   }
 
+  // handle Delete Modal Open
+  const handleDeleteModalOpen = () => {
+    setShowDeleteBoardModal(true);
+    setShowActivityModal(false);
+  }
+
+  // Delete board functionality
+  const deleteBoard = async () => {
+    // logic here
+  }
+
   // Fetch the board data on page load
   useEffect(() => {
     if (user?.token) {
@@ -471,10 +483,14 @@ const BoardPage = () => {
                 <MdGroups className='mr-3' size={23}/>
                 <button>Board members</button>
               </Link>
-              <div className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
+              <button className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
                 <IoMdArchive className='mr-3' size={23}/>
                 <button>Archive this board</button>
-              </div>
+              </button>
+              <button onClick={handleDeleteModalOpen} className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
+                <MdDeleteSweep className='mr-3' size={23}/>
+                <button>Delete this board</button>
+              </button>
             </div>
           )
         }
@@ -600,6 +616,25 @@ const BoardPage = () => {
           )
         }
       </div>
+      {
+        showDeleteBoardModal && (
+          <div className='fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center'>
+            <div className='relative w-full mx-4 max-w-md bg-input-bg rounded-md'>
+              <button onClick={() => setShowDeleteBoardModal(false)} aria-label="Close modal" className='absolute top-2 right-2 text-white'>
+                <MdClose size={20} />
+              </button>
+              <div className='p-6'>
+                <h3 className='text-xl font-semibold text-white'>Delete Board</h3>
+                <p className='mt-4 text-gray-200'>Are you sure you want to delete this board? This action cannot be undone.</p>
+                <div className='flex space-x-4 justify-end mt-6'>
+                  <button onClick={() => setShowDeleteBoardModal(false)} className='font-medium rounded-md ring-2 ring-blue-600 hover:ring-blue-500 px-3 py-1 text-white'>Cancel</button>
+                  <button className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>Delete</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
     </div>
   )
 }
