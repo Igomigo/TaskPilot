@@ -164,6 +164,59 @@ const BoardMembersPage = () => {
         }
     }
 
+    // Remove member from board
+    const removeMember = async (userId) => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}/${userId}`;
+
+        try {
+            const response = await fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user?.token}`
+                }
+            });
+
+            if (response.status === 401) {
+                logout();
+            }
+
+            if (!response.ok) {
+                response.json().then(errorData => {
+                    console.error("Error removing member:", errorData); // Log the full error object
+                    // Optionally, display a more user-friendly error message
+                    alert(`Error: ${errorData.message || "Failed to remove member."}`);
+                    throw new Error(`HTTP error! status: ${response.status} - ${JSON.stringify(errorData)}`);
+                }).catch(err => {
+                    console.error("Failed to parse error response:", err);
+                    // Handle the case where the server sends a non-JSON error
+                    alert("Error removing member.  Could not get server details.");
+                });
+            }
+
+            const message = await response.json();
+
+            setMembers(prev => {
+                const updatedMembers = [...prev];
+                const index = updatedMembers.findIndex(
+                    member => member._id === userId
+                );
+
+                if (index !== -1) {
+                    updatedMembers.splice(index, 1);
+                }
+
+                return updatedMembers;
+            });
+
+            toast.success(message);
+
+        } catch (error) {
+            console.log("Error:", error);
+            toast.error("Failed to remove member from board");
+        }
+    }
+
     // Fetch board members data
     useEffect(() => {
         const getMembers = async () => {
@@ -280,7 +333,7 @@ const BoardMembersPage = () => {
                                                 </div>
                                             </div>
                                             <div className='flex space-x-2'>
-                                                <button className="text-red-500 hover:text-red-600 p-2 h-fit w-fit rounded-full hover:bg-red-100 hover:bg-opacity-20 transition duration-200">
+                                                <button onClick={() => removeMember(member?._id)} className="text-red-500 hover:text-red-600 p-2 h-fit w-fit rounded-full hover:bg-red-100 hover:bg-opacity-20 transition duration-200">
                                                     <FiUserMinus title='remove member' size={20} />
                                                 </button>
                                                 {member.role !== "admin" && (
