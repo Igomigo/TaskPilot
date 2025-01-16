@@ -6,12 +6,10 @@ const CardSchema = new Schema({
     title: {
         type: String,
         required: true,
-        maxLength: 50,
         unique: true
     },
     description: {
-        type: String,
-        maxLength: 300
+        type: String
     },
     dueDate: {
         type: Date,
