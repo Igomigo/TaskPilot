@@ -83,6 +83,7 @@ const BoardPage = () => {
   const [pageLoading, setPageLoading] = useState(false);
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [showDeleteBoardModal, setShowDeleteBoardModal] = useState(false);
+  const [deleteBoardLoading, setDeleteBoardLoading] = useState(false);
 
   // Handle on change event for a new list
   const handleOnchangeForNewList = (e) => {
@@ -334,7 +335,40 @@ const BoardPage = () => {
 
   // Delete board functionality
   const deleteBoard = async () => {
-    // logic here
+    const url = `${import.meta.env.VITE_BACKEND_URL}/b/delete/${boardId}`;
+
+    setDeleteBoardLoading(true);
+
+    try {
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${user?.token}`
+        }
+      });
+
+      if (response.status === 401) {
+        logout();
+      }
+
+      if (!response.ok) {
+        throw new Error("Error deleting board");
+      }
+
+      const result = await response.json();
+
+      if (result.message) {
+        toast.success("Board deleted successfully");
+        navigate("/");
+      }
+      
+    } catch (error) {
+      console.error("Error:", error);
+
+    } finally {
+      setDeleteBoardLoading(false);
+    }
   }
 
   // Fetch the board data on page load
@@ -628,7 +662,7 @@ const BoardPage = () => {
                 <p className='mt-4 text-gray-200'>Are you sure you want to delete this board? This action cannot be undone.</p>
                 <div className='flex space-x-4 justify-end mt-6'>
                   <button onClick={() => setShowDeleteBoardModal(false)} className='font-medium rounded-md ring-2 ring-blue-600 hover:ring-blue-500 px-3 py-1 text-white'>Cancel</button>
-                  <button className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>Delete</button>
+                  <button onClick={deleteBoard} className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>Delete</button>
                 </div>
               </div>
             </div>
