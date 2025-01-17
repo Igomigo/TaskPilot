@@ -285,39 +285,58 @@ exports.removeMember = async (req, res) => {
 }
 
 exports.deleteBoard = async (req, res) => {
-    // Deletes a particular board and all associated data from the database
+    console.log('Starting deleteBoard function');
     try {
         const boardId = req.params.boardId;
-        // find the board by id
+        //console.log(`Attempting to delete board with ID: ${boardId}`);
+        
+        // Find the board by id
         const board = await Board.findById(boardId);
         if (!board) {
+            //console.log(`Board with ID ${boardId} not found`);
             return res.status(404).json({message: "Board not found"});
         }
-        // delete the list and data for that board
+        //console.log(`Board found: ${board._id}`);
+
+        // Delete the lists and cards for that board
         const listIds = board.lists;
-        await Promise.all(listIds.map(async (listId) => {
-            const list = await List.findById(listId)
+        //console.log(`Found ${listIds.length} lists to delete`);
+
+        for (const listId of listIds) {
+            //console.log(`Processing list: ${listId}`);
+            const list = await List.findById(listId);
             if (list) {
                 const cardIds = list.cards;
-                // iterate through to delete the comments and card data
-                await Promise.all(cardIds.map(async (cardId) => {
-                    await Comment.deleteMany({card: cardId});
-                    await Card.findByIdAndDelete(cardId);
-                }));
+                //console.log(`Found ${cardIds.length} cards in list ${listId}`);
+
+                for (const cardId of cardIds) {
+                    //console.log(`Deleting comments for card: ${cardId}`);
+                    const commentDeleteResult = await Comment.deleteMany({card: cardId});
+                    //console.log(`Deleted ${commentDeleteResult.deletedCount} comments for card ${cardId}`);
+
+                    //console.log(`Deleting card: ${cardId}`);
+                    const cardDeleteResult = await Card.findByIdAndDelete(cardId);
+                    //console.log(`Card delete result: ${cardDeleteResult ? 'Success' : 'Failed'}`);
+                }
             }
-            // delete the list
-            await List.findByIdAndDelete(listId);
-        }));
-        // Finally delete the board itelf
-        await Board.findByIdAndDelete(id);
-        // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(board._id).emit("deleteBoard", board);
-        // return a response to the client
+            
+            //console.log(`Deleting list: ${listId}`);
+            const listDeleteResult = await List.findByIdAndDelete(listId);
+            //console.log(`List delete result: ${listDeleteResult ? 'Success' : 'Failed'}`);
+        }
+
+        // Finally delete the board itself
+        //console.log(`Deleting board: ${boardId}`);
+        const boardDeleteResult = await Board.findByIdAndDelete(boardId);
+        //console.log(`Board delete result: ${boardDeleteResult ? 'Success' : 'Failed'}`);
+
+        //console.log('Board deletion process completed successfully');
         return res.status(200).json({message: "Board deleted successfully"});
     } catch (err) {
-        console.log(`Error deleting board: ${err.message}`);
+        console.error(`Error in deleteBoard function: ${err.message}`);
+        console.error(`Error stack: ${err.stack}`);
         res.status(500).json({
-            error: `An internal error occured: ${err.message}`});
+            error: `An internal error occurred: ${err.message}`
+        });
     }
 }

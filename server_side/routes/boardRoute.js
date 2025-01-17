@@ -57,10 +57,10 @@ router.delete(
 
 /**
  * DELETE request to delete a particular board
- * url: http://localhost:3000/b/delete/:boardId
+ * url: http://localhost:3000/b/:boardId
  */
 router.delete(
-    "/delete/:boardId", authWare,
+    "/:boardId", authWare,
     permission.addRemDelPermission, board.deleteBoard
 );
 

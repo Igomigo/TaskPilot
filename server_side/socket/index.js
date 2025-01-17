@@ -147,12 +147,12 @@ function setupSocketServer(io) {
 
     // Schedule deadline checker using cron
     cron.schedule('* * * * *', async () => {
-        console.log("Running deadline check for all boards...");
+        //console.log("Running deadline check for all boards...");
         const overdueCardsByBoardId = await checkDeadline();
 
         for (const [boardId, overdueCards] of Object.entries(overdueCardsByBoardId)) {
             if (overdueCards.length > 0) {
-                console.log(overdueCards);
+                //console.log(overdueCards);
                 io.to(boardId).emit("overdueCards", overdueCards);
             }
         }
