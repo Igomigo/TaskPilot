@@ -335,39 +335,50 @@ const BoardPage = () => {
 
   // Delete board functionality
   const deleteBoard = async () => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/b/delete/${boardId}`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}/b/${boardId}`;
 
     setDeleteBoardLoading(true);
 
     try {
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${user?.token}`
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${user?.token}`
+            }
+        });
+
+        if (response.status === 401) {
+            logout();
+            return;
         }
-      });
 
-      if (response.status === 401) {
-        logout();
-      }
+        if (response.status === 403) {
+            toast.error("You don't have permission to delete this board");
+            return;
+        }
 
-      if (!response.ok) {
-        throw new Error("Error deleting board");
-      }
+        if (response.status === 404) {
+            toast.error("Board not found");
+            return;
+        }
 
-      const result = await response.json();
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Error deleting board");
+        }
 
-      if (result.message) {
-        toast.success("Board deleted successfully");
-        navigate("/");
-      }
-      
+        const result = await response.json();
+
+        if (result.message) {
+            toast.success("Board deleted successfully");
+            navigate("/");
+        }
     } catch (error) {
-      console.error("Error:", error);
-
+        console.error("Error:", error);
+        toast.error(error.message);
     } finally {
-      setDeleteBoardLoading(false);
+        setDeleteBoardLoading(false);
     }
   }
 
@@ -662,7 +673,11 @@ const BoardPage = () => {
                 <p className='mt-4 text-gray-200'>Are you sure you want to delete this board? This action cannot be undone.</p>
                 <div className='flex space-x-4 justify-end mt-6'>
                   <button onClick={() => setShowDeleteBoardModal(false)} className='font-medium rounded-md ring-2 ring-blue-600 hover:ring-blue-500 px-3 py-1 text-white'>Cancel</button>
-                  <button onClick={deleteBoard} className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>Delete</button>
+                  <button onClick={deleteBoard} className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>
+                    {
+                      deleteBoardLoading ? ("Deleting...") : ("Delete")
+                    }
+                  </button>
                 </div>
               </div>
             </div>
