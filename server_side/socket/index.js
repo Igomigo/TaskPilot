@@ -147,6 +147,7 @@ function setupSocketServer(io) {
 
         // Add Comment
         socket.on("AddComment", async (comment) => {
+            //console.log("Received add comment event", comment);
             if (comment) {
                 const cardId = comment.cardId;
                 const current_user = socket.current_user;
@@ -197,7 +198,11 @@ function setupSocketServer(io) {
                     await logger.save();
                     
                     // Emit the new comment event to the board
-                    io.to(list.board).emit("newComment", commentData);
+                    io.to(list.board.toString()).emit("newComment", commentData);
+
+                    //console.log("boardId:", list.board);
+
+                    //console.log("Comment operation successful");
                 } catch (error) {
                     console.log("Error adding comment:", error.message);
                 }
