@@ -10,7 +10,8 @@ const BoardSchema = new Schema({
     },
     description: {
         type: String,
-        maxLength: 500
+        maxLength: 500,
+        required: true
     },
     owner: {
         type: Schema.Types.ObjectId,

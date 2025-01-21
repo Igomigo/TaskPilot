@@ -16,8 +16,8 @@ exports.createBoard = async (req, res) => {
         const current_user = req.current_user;
         const {title, description} = req.body;
 
-        if (!title) {
-            return res.status(400).json({Error: "Title missing"});
+        if (!title || !description) {
+            return res.status(400).json({Error: "Title or description missing"});
         }
         // Create the board
         const board = new Board({
@@ -225,20 +225,26 @@ exports.removeMember = async (req, res) => {
     const { boardId, userId } = req.params;
     const current_user = req.current_user;
 
+    console.log(`Attempting to remove a member, userId: ${userId}, boardId: ${boardId}`);
+
     try {
         // Check if the returned current user is an admin
         if (userId === current_user._id) {
+            console.log(`userId: ${userId} is not current_userId ${current_user._Id}`);
             return res.status(403).json({
                 error: true,
                 message: "Cannot perform this action"
             })
         }
 
+        console.log("Attempting to find the board by Id...")
         const board = await Board.findById(boardId);
 
         if (!board) {
+            console.log("Board not found");
             return res.status(404).json({error: "Board not found"});
         }
+        console.log("Board found");
 
         // // Check if user is a member of the board
         // if (!board.members.includes(userId)) {
@@ -247,12 +253,29 @@ exports.removeMember = async (req, res) => {
         //     });
         // }
 
+        console.log("board.members:", board.members); // Log the array of members
+        console.log("userId:", userId); // Log the userId being searched
+        console.log("Checking each member:");
+        board.members.forEach((member, index) => {
+            console.log(`Index ${index}: member=${member.toString()}, matches=${member.toString() === userId.toString()}`);
+        });
+
         // Find the index of the user in the members array
-        const userIndex = board.members.findIndex(userId);
+        console.log("Finding the index of the user in the board members field...");
+        const userIndex = board.members.findIndex(member => member.toString() === userId.toString());
+
+        if (userIndex === -1) {
+            console.log("User index was not found");
+            return res.status(500).json("User index was not found");
+        }
+
+        console.log("User index found, now let's start removing the user");
 
         // remove user from the board
         board.members.splice(userIndex, 1);
         await board.save();
+
+        console.log("User successfully removed from the board");
 
         // log the activity
         const user = await User.findById(userId);
@@ -269,6 +292,8 @@ exports.removeMember = async (req, res) => {
         // emit the event to all connected clients
         // const io = req.app.get("socketio");
         // io.to(board._id).emit("removeMember", board);
+
+        console.log("Operation successful");
 
         // return a response to the client
         return res.status(200).json({

@@ -55,47 +55,52 @@ function setupSocketServer(io) {
         // Handle the new card event
         socket.on("newCard", async (newCard) => {
             if (newCard) {
-                // Check that another card with same title doesn't exist
-                const exists = await Card.findOne({
-                    title: newCard.title,
-                    listId: newCard.listId
-                });
+                try {
+                    // Check that another card with same title doesn't exist
+                    const exists = await Card.findOne({
+                        title: newCard.title,
+                        listId: newCard.listId
+                    });
 
-                if (exists) {
-                    io.to(socket.userId).emit("alreadyExists", "Card already exists in this list");
-                    return;
+                    if (exists) {
+                        io.to(socket.userId).emit("alreadyExists", "Card already exists in this list");
+                        return;
+                    }
+
+                    const card = new Card({
+                        title: newCard.title,
+                        board: newCard.boardId,
+                        listId: newCard.listId,
+                        createdBy: socket.current_user._id
+                    });
+                    const savedCard = await card.save();
+
+                    // update the list accordingly
+                    const list = await List.findByIdAndUpdate(newCard.listId, {
+                        $push: {"cards": savedCard._id},
+                        updatedAt: Date.now()
+                        },
+                        {new: true}
+                    );
+
+                    // Create the actiivity log
+                    const logger = new ActivityLog({
+                        action: "create",
+                        entity: "card",
+                        entityId: card._id,
+                        details: `${socket.current_user.username} created the card: ${card.title}`,
+                        createdBy: socket.current_user._id,
+                        boardId: list.board,
+                        listId: list._id,
+                        cardId: card._id
+                    });
+                    await logger.save();
+
+                    io.to(newCard.boardId).emit("cardCreated", savedCard);
+
+                } catch (error) {
+                    console.log("Error adding new card:", error.message);
                 }
-
-                const card = new Card({
-                    title: newCard.title,
-                    board: newCard.boardId,
-                    listId: newCard.listId,
-                    createdBy: socket.current_user._id
-                });
-                const savedCard = await card.save();
-
-                // update the list accordingly
-                const list = await List.findByIdAndUpdate(newCard.listId, {
-                    $push: {"cards": savedCard._id},
-                    updatedAt: Date.now()
-                    },
-                    {new: true}
-                );
-
-                // Create the actiivity log
-                const logger = new ActivityLog({
-                    action: "create",
-                    entity: "card",
-                    entityId: card._id,
-                    details: `${socket.current_user.username} created the card: ${card.title}`,
-                    createdBy: socket.current_user._id,
-                    boardId: list.board,
-                    listId: list._id,
-                    cardId: card._id
-                });
-                await logger.save();
-
-                io.to(newCard.boardId).emit("cardCreated", savedCard);
             }
         });
 
@@ -138,6 +143,65 @@ function setupSocketServer(io) {
         socket.on("leaveBoard", (boardId) => {
             socket.leave(boardId);
             console.log(`User ${socket.userId} left the board ${boardId}`);
+        });
+
+        // Add Comment
+        socket.on("AddComment", async (comment) => {
+            if (comment) {
+                const cardId = comment.cardId;
+                const current_user = socket.current_user;
+                const text = comment.text;
+
+                try {
+                    // create new comment document
+                    const newComment = new Comment({
+                        text: text,
+                        createdBy: current_user._id,
+                        card: cardId
+                    });
+                    await newComment.save();
+
+                    // Update the comments array of the associated card document
+                    const card = await Card.findByIdAndUpdate(cardId, {
+                        $push: {comments: newComment._id},
+                        updatedAt: Date.now()
+                    }, { new: true });
+
+                    if (!card) {
+                        console.log("Card not found");
+                        return;
+                    }
+
+                    // find the list via the cardId
+                    const list = await List.findOne({cards: {$in: [cardId]}});
+                    if (!list) {
+                        // Incase no list is found
+                        console.log('No list found containing the specified cardId');
+                        return;
+                    }
+
+                    const commentData = await Comment.findById(newComment._id)
+                    .populate("createdBy");
+
+                    // Log the create activity
+                    const logger = new ActivityLog({
+                        action: "create",
+                        entity: "Comment",
+                        entityId: commentData._id,
+                        details: `${current_user.username} on ${card.title}: ${comment.text}`,
+                        createdBy: current_user._id,
+                        boardId: list.board,
+                        listId: list._id,
+                        cardId: cardId
+                    });
+                    await logger.save();
+                    
+                    // Emit the new comment event to the board
+                    io.to(list.board).emit("newComment", commentData);
+                } catch (error) {
+                    console.log("Error adding comment:", error.message);
+                }
+            }
         });
 
         socket.on("disconnect", (socket) => {
