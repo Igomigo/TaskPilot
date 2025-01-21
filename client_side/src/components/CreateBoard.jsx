@@ -34,7 +34,7 @@ const CreateBoard = ({ onClose, user, updateBoards }) => {
       }
       
       if (response?.status === 400) {
-        toast.error("Title is required");
+        toast.error("Title and description must be provided");
         return;
       }
 

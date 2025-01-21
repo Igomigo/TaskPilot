@@ -506,8 +506,8 @@ const BoardPage = () => {
       socketConnection.off("overdueCards");
       socketConnection.off("alreadyExists");
       socketConnection.off("Auth_error");
-      socketConnection.emit("leaveBoard", boardId);
-      socketConnection.disconnect();
+      //socketConnection.emit("leaveBoard", boardId);
+      //socketConnection.disconnect();
     };
 
   }, [boardId, dispatch]);

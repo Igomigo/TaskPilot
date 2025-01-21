@@ -26,7 +26,7 @@ const CardPage = () => {
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [saveLoading, setSaveLoading] = useState(false);
-    const [commentLoading, setCommentLoading] = useState(false);
+    const [commentLoading, setCommentLoading] = useState(false); 
 
     const handleCloseModal = () => {
         navigate(-1);
@@ -40,41 +40,56 @@ const CardPage = () => {
             return;
         }
 
-        setCommentLoading(true);
-        try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/c/${cardData._id}/comment`;
-            const response = await fetch(url, {
-                method: "POST",
-                body: JSON.stringify({text: comment}),
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${user?.token}`
-                }
-            });
-
-            if (response.status === 401) {
-                toast.error("Session expired, kindly login again");
-                handleLogout();
-            }
-
-            if (!response.ok) {
-                throw new Error("Error sending new comment");
-            }
-
-            const commentData = await response.json();
-
-            setComments(prev => {
-                return [commentData, ...prev];
-            });
-            
-            setComment("");
-
-        } catch (error) {
-            console.log("Error:", error.message);
-
-        } finally {
-            setCommentLoading(false);
+        // Construct the comment data
+        const commentData = {
+            text: comment,
+            cardId: cardData._id
         }
+
+        setCommentLoading(true);
+
+        const socketConnection = user?.socketConnection;
+        console.log("SocketConnection:", socketConnection);
+        if (socketConnection) {
+            socketConnection.emit("AddComment", commentData);
+            console.log("Socket event emitted");
+            setComment("");
+        }
+
+        // try {
+        //     const url = `${import.meta.env.VITE_BACKEND_URL}/c/${cardData._id}/comment`;
+        //     const response = await fetch(url, {
+        //         method: "POST",
+        //         body: JSON.stringify({text: comment}),
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "Authorization": `Bearer ${user?.token}`
+        //         }
+        //     });
+
+        //     if (response.status === 401) {
+        //         toast.error("Session expired, kindly login again");
+        //         handleLogout();
+        //     }
+
+        //     if (!response.ok) {
+        //         throw new Error("Error sending new comment");
+        //     }
+
+        //     const commentData = await response.json();
+
+        //     setComments(prev => {
+        //         return [commentData, ...prev];
+        //     });
+            
+        //     setComment("");
+
+        // } catch (error) {
+        //     console.log("Error:", error.message);
+
+        // } finally {
+        //     setCommentLoading(false);
+        // }
     };
 
     // Handle submit form
@@ -199,6 +214,27 @@ const CardPage = () => {
 
     }, [cardTitle, user]);
 
+    useEffect(() => {
+        const socketConnection = user?.socketConnection;
+        if (socketConnection) {
+            socketConnection.on("newComment", (commentData) => {
+                if (commentData) {
+                    // Format the updatedat time to a friendly format
+                    const parsedDate = parseISO(commentData.updatedAt);
+                    commentData.updatedAt = formatDistanceToNow(parsedDate, {addSuffix: true});
+                    setComments(prevComments => {
+                        const isExists = prevComments.some(comment => comment._id === commentData._id);
+                        if (!isExists) {
+                            return [commentData, ...prevComments];
+                        }
+                        return prevComments;
+                    });
+                }
+                setCommentLoading(false);
+            });
+        }
+    }, [user]);
+
     return (
         <div className="fixed z-50 inset-0 overflow-y-auto bg-black bg-opacity-50 flex items-start justify-center pt-10 px-4 sm:px-6 lg:px-8">
             <div className="relative bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mb-3 transform transition-all">
@@ -265,7 +301,7 @@ const CardPage = () => {
                                         </div>
                                     </div>
                                     <span className="ml-3 text-sm text-gray-300">Mark as Completed</span>
-                                </label>
+                                </label>  
                             </div>
                         </div>
 
