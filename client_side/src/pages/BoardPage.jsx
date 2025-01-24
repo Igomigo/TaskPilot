@@ -84,6 +84,10 @@ const BoardPage = () => {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [showDeleteBoardModal, setShowDeleteBoardModal] = useState(false);
   const [deleteBoardLoading, setDeleteBoardLoading] = useState(false);
+  const [showListActions, setShowListActions] = useState({});
+  const [showDeleteListModal, setShowDeleteListModal] = useState(false);
+  const [deleteListLoading, setDeleteListLoading] = useState(false);
+  const [currentListToBeDeleted, setCurrentListToBeDeleted] = useState({});
 
   // Handle on change event for a new list
   const handleOnchangeForNewList = (e) => {
@@ -176,6 +180,22 @@ const BoardPage = () => {
       [listId]: !prev[listId]
     }));
   }
+
+  // Toggle list actions state
+  const toggleListActionsState = (listId) => {
+    setShowListActions(prev => ({
+      ...prev,
+      [listId]: !prev[listId]
+    }));
+  }
+
+  const toggleDeleteListModal = (list) => {
+    setCurrentListToBeDeleted(list);
+    setShowDeleteListModal(prev => !prev);
+  }
+
+  // Handle delete list
+  const deleteList = async () => {}
 
   // Handle submit card
   const handleSubmitCard = async (e, listId) => {
@@ -547,9 +567,25 @@ const BoardPage = () => {
               <div key={list._id} className='w-72 h-fit max-h-[calc(100vh-150px)] rounded-lg pb-3 flex-shrink-0 mr-4 flex flex-col bg-form-bg'>
                 <div className='flex justify-between items-center px-3 py-4'>
                   <h2 className='text-gray-200 font-semibold'>{list?.title}</h2>
-                  <button className='text-white'>
-                    <PiDotsThreeVertical size={25}/>
-                  </button>
+                  <div className='relative'>
+                    <button onClick={() => toggleListActionsState(list._id)} className='group text-white'>
+                      <PiDotsThreeVertical className='group-hover:text-white group-hover:bg-gray-500 group-hover:rounded-lg' size={25}/>
+                    </button>
+                    {
+                      showListActions[list._id] && (
+                        <div className='absolute flex flex-col p-2 text-sm w-fit right-0 whitespace-nowrap bg-form-bg border border-gray-500 rounded-md text-white'>
+                          <button onClick={() => toggleDeleteListModal(list)} className='flex space-x-2 items-center justify-center hover:bg-input-bg px-3 py-2 rounded-md'>
+                            <MdDeleteSweep size={18} />
+                            <p>Delete this list</p>
+                          </button>
+                          <button className='flex space-x-2 items-center justify-center hover:bg-input-bg px-3 py-2 rounded-md'>
+                            <IoMdArchive />
+                            <p>Archive this list</p>
+                          </button>
+                        </div>
+                      )
+                    }
+                  </div>
                 </div>
                 {/** Display all cards for each list */}
                 <div className='scroll overflow-y-auto flex-grow'>
@@ -676,6 +712,29 @@ const BoardPage = () => {
                   <button onClick={deleteBoard} className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>
                     {
                       deleteBoardLoading ? ("Deleting...") : ("Delete")
+                    }
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+      {
+        showDeleteListModal && (
+          <div className='fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center'>
+            <div className='relative w-full mx-4 max-w-md bg-input-bg rounded-md'>
+              <button onClick={() => setShowDeleteListModal(false)} aria-label="Close modal" className='absolute top-2 right-2 text-white'>
+                <MdClose size={20} />
+              </button>
+              <div className='p-6'>
+                <h3 className='text-xl font-semibold text-white'>Delete the <span className='font-bold text-blue-600'>{currentListToBeDeleted?.title}</span> list</h3>
+                <p className='mt-4 text-gray-200'>Are you sure you want to delete this list? This action cannot be undone.</p>
+                <div className='flex space-x-4 justify-end mt-6'>
+                  <button onClick={() => setShowDeleteListModal(false)} className='font-medium rounded-md ring-2 ring-blue-600 hover:ring-blue-500 px-3 py-1 text-white'>Cancel</button>
+                  <button onClick={deleteList} className='font-medium bg-red-500 hover:bg-red-600 rounded-md px-3 py-1 text-white'>
+                    {
+                      deleteListLoading ? ("Deleting...") : ("Delete")
                     }
                   </button>
                 </div>
