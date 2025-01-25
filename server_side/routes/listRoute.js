@@ -19,15 +19,15 @@ router.get("/:boardId/lists", authWare, list.getLists);
 
 /**
  * PUT request to update a particular list data
- * url: http://localhost:3000/b/list/:id
+ * url: http://localhost:3000/b/:id
  */
-router.put("/list/:listId", authWare, list.updateList);
+router.put("/:listId", authWare, list.updateList);
 
 /**
  * DELETE request to delete a particular list data
- * url: http://localhost:3000/b/list/:id
+ * url: http://localhost:3000/b/:listId
  */
-router.delete("/list/:listId", authWare, list.deleteList);
+router.delete("/:listId/delete-list", authWare, list.deleteList);
 
 
 module.exports = router;

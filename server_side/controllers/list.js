@@ -132,20 +132,24 @@ exports.updateList = async (req, res) => {
  
 exports.deleteList = async (req, res) => {
     // Delete a list and all associated data from the board
+    const { listId } = req.params;
+    
     try {
-        const listId = req.params.listId;
         const list = await List.findById(listId);
         const board = await Board.findById(list.board);
         const current_user = req.current_user;
+
         if (current_user._id.toString() !== list.createdBy.toString(
         ) && current_user._id.toString() !== board.owner.toString()) {
             return res.status(403).json({
                 message: "You are not permitted to delete this list"
             });
         }
+
         if (!list) {
-            return res.status(400).json({error: "List not found"});
+            return res.status(404).json({error: "List not found"});
         }
+
         // Delete all the associated data for the list
         // Delete the comment and card data for that list
         const cardIds = list.cards;
@@ -155,14 +159,17 @@ exports.deleteList = async (req, res) => {
                 await Card.findByIdAndDelete(cardId);
             }));
         }
+
         // delete the actual list
         await List.findByIdAndDelete(listId);
+        
         // delete the reference from the board document
         const boardId = list.board;
         await Board.findByIdAndUpdate(boardId, {
             $pull: {lists: listId},
             updatedAt: Date.now()
         });
+
         // Log the delete activity
         let logDetails = `${req.current_user.username} deleted ${list.title} from this board`
         const logger = new ActivityLog({
@@ -175,13 +182,13 @@ exports.deleteList = async (req, res) => {
             listId: list._id
         });
         await logger.save();
-        // emit the event to all connected clients
-        const io = req.app.get("socketio");
-        io.to(list.board).emit("deleteList", list);
+
         // return a response to the client
         return res.status(200).json({
-            message: "list deleted successfully"
+            message: "list deleted successfully",
+            list
         });
+
     } catch (err) {
         console.log(`${err}`);
         return res.status(500).json({

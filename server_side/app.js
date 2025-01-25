@@ -42,7 +42,7 @@ app.use(cookie_parser());
 app.use("/auth", authRoute);
 app.use("/u", userRoute);
 app.use("/b", boardRoute);
-app.use("/b", listRoute);
+app.use("/l", listRoute);
 app.use("/b", cardRoute);
 app.use("/c", commentRoute);
 app.use("/b", logRoute);
