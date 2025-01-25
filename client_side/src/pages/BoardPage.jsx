@@ -13,7 +13,7 @@ import io from "socket.io-client";
 import { LuClock4 } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa6";
 import { format } from 'date-fns';
-import { setSocketConnection } from '../redux/userSlice';
+import { logout, setSocketConnection } from '../redux/userSlice';
 import Loading from '../components/loading';
 
 // Dummy board data
@@ -189,13 +189,56 @@ const BoardPage = () => {
     }));
   }
 
+  // Toggle delete list modal state and set the current list to be deleted
   const toggleDeleteListModal = (list) => {
     setCurrentListToBeDeleted(list);
     setShowDeleteListModal(prev => !prev);
   }
 
   // Handle delete list
-  const deleteList = async () => {}
+  const deleteList = async () => {
+    const listId = currentListToBeDeleted._id;
+    const url = `${import.meta.env.VITE_BACKEND_URL}/l/${listId}/delete-list`;
+    
+    setDeleteListLoading(true);
+
+    try {
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${user?.token}`
+        }
+      });
+
+      if (response.status === 401) {
+        logout();
+        return;
+      }
+
+      if (response.status === 403) {
+        const result = await response.json();
+        toast.error(result.message);
+        return;
+      }
+
+      if (!response.ok) {
+        const result = await response.json();
+        console.log(result);
+        throw new Error("Error while deleting list");
+      }
+
+      const deletedListData = await response.json();
+
+      console.log("Deleted list:", deletedListData);
+
+    } catch (error) {
+      console.error("Error:", error);
+
+    } finally {
+      setDeleteListLoading(false);
+    }
+  }
 
   // Handle submit card
   const handleSubmitCard = async (e, listId) => {
@@ -543,7 +586,7 @@ const BoardPage = () => {
         </button>
         {
           showActivityModal && (
-            <div className='absolute text-sm border border-slate-700 right-0 mr-6 top-0 px-2 py-4 w-fit mt-11 rounded-md bg-form-bg h-fit text-white'>
+            <div className='absolute text-sm border border-slate-700 z-40 right-0 mr-6 top-0 px-2 py-4 w-fit mt-11 rounded-md bg-form-bg h-fit text-white'>
               <Link to={`/b/${boardId}/members`} className='flex w-full items-center hover:bg-input-bg hover:text-white rounded-md text-gray-300 px-3 py-2 text-sm'>
                 <MdGroups className='mr-3' size={23}/>
                 <button>Board members</button>
