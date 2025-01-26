@@ -9,12 +9,13 @@ import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch } from 'react-redux';
 import Avatar from './Avatar';
-import Logout from '../hooks/useLogout';
+import logout from '../hooks/useLogout';
 
 const Topbar = ({ toggleSidebar, user }) => {
     // Hooks
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const handleLogout = logout();
 
     // State Management
     const [toggleArrow, setToggleArrow] = useState(true);
@@ -43,7 +44,7 @@ const Topbar = ({ toggleSidebar, user }) => {
 
     // Handle logout
     const logOut = () => {
-        Logout();
+        handleLogout()
     }
 
     return (
