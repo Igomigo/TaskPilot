@@ -16,49 +16,6 @@ import { format } from 'date-fns';
 import { logout, setSocketConnection } from '../redux/userSlice';
 import Loading from '../components/loading';
 
-// Dummy board data
-// const initialLists = [
-//   {
-//     id: '1',
-//     title: 'To Do',
-//     cards: [
-//       { id: '1', content: 'Research market trends' },
-//       { id: '2', content: 'Create project proposal' },
-//       { id: '3', content: 'Analyze competitor strategies' },
-//       { id: '4', content: 'Define target audience' },
-//       { id: '5', content: 'Outline project timeline' },
-//       { id: '6', content: 'Estimate budget requirements' },
-//       { id: '7', content: 'Identify potential risks' },
-//       { id: '8', content: 'Draft initial project plan' },
-//       { id: '9', content: 'Design user interface' },
-//       { id: '10', content: 'Develop backend API' },
-//       { id: '11', content: 'Implement authentication' },
-//       { id: '12', content: 'Set up CI/CD pipeline' },
-//     ]
-//   },
-//   {
-//     id: '2',
-//     title: 'In Progress',
-//     cards: [
-//       { id: '9', content: 'Design user interface' },
-//       { id: '10', content: 'Develop backend API' },
-//       { id: '11', content: 'Implement authentication' },
-//       { id: '12', content: 'Set up CI/CD pipeline' },
-//     ]
-//   },
-//   {
-//     id: '3',
-//     title: 'Done',
-//     cards: [
-//       { id: '13', content: 'Project kickoff meeting' },
-//       { id: '14', content: 'Define project scope' },
-//       { id: '10', content: 'Develop backend API' },
-//       { id: '11', content: 'Implement authentication' },
-//       { id: '12', content: 'Set up CI/CD pipeline' },
-//     ]
-//   }
-// ]
-
 const BoardPage = () => {
   // Hooks
   const { boardId } = useParams();
