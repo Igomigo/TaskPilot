@@ -189,6 +189,14 @@ const BoardPage = () => {
 
       console.log("Deleted list:", deletedListData);
 
+      // Update the list array to remove the deleted list from the UI
+      setLists(prevLists => 
+        prevLists.filter(list => list._id === deletedListData._id)
+      );
+
+      setShowDeleteListModal(false);
+      toast.success("List deleted successfully");
+
     } catch (error) {
       console.error("Error:", error);
 
