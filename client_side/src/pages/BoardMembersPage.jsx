@@ -8,93 +8,6 @@ import Loading from '../components/loading';
 import useLogout from '../hooks/useLogout';
 import toast from 'react-hot-toast';
 
-const mockMembers = [
-    {
-        _id: "60d0fe4f5311236168a109ca",
-        board: "60d0fe4f5311236168a109cb",
-        role: "admin",
-        user: {
-            _id: "60d0fe4f5311236168a109cc",
-            username: "john_doe",
-            email: "john_doe@example.com",
-            profile_pic: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
-            isVerified: true
-        },
-        createdAt: "2023-10-01T12:00:00Z",
-        updatedAt: "2023-10-01T12:00:00Z"
-    },
-    {
-        _id: "60d0fe4f5311236168a109cd",
-        board: "60d0fe4f5311236168a109cb",
-        role: "member",
-        user: {
-            _id: "60d0fe4f5311236168a109ce",
-            username: "jane_smith",
-            email: "jane_smith@example.com",
-            profile_pic: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
-            isVerified: true
-        },
-        createdAt: "2023-10-01T12:00:00Z",
-        updatedAt: "2023-10-01T12:00:00Z"
-    },
-    {
-        _id: "60d0fe4f5311236168a109cf",
-        board: "60d0fe4f5311236168a109cb",
-        role: "member",
-        user: {
-            _id: "60d0fe4f5311236168a109d0",
-            username: "alice_jones",
-            email: "alice_jones@example.com",
-            profile_pic: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
-            isVerified: false
-        },
-        createdAt: "2023-10-01T12:00:00Z",
-        updatedAt: "2023-10-01T12:00:00Z"
-    },
-    {
-        _id: "60d0fe4f5311236168a109d1",
-        board: "60d0fe4f5311236168a109cb",
-        role: "member",
-        user: {
-            _id: "60d0fe4f5311236168a109d2",
-            username: "bob_brown",
-            email: "bob_brown@example.com",
-            profile_pic: "",
-            isVerified: true
-        },
-        createdAt: "2023-10-01T12:00:00Z",
-        updatedAt: "2023-10-01T12:00:00Z"
-    },
-    {
-        _id: "60d0fe4f5311236168a109d3",
-        board: "60d0fe4f5311236168a109cb",
-        role: "admin",
-        user: {
-            _id: "60d0fe4f5311236168a109d4",
-            username: "charlie_clark",
-            email: "charlie_clark@example.com",
-            profile_pic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80",
-            isVerified: false
-        },
-        createdAt: "2023-10-01T12:00:00Z",
-        updatedAt: "2023-10-01T12:00:00Z"
-    },
-    {
-        _id: "60d0fe4f5311236168a10372",
-        board: "60d0fe4f5311236168a109cb",
-        role: "member",
-        user: {
-            _id: "60d0fe4f5311236168a109d4",
-            username: "Charlie James",
-            email: "charlieclark@example.com",
-            profile_pic: "",
-            isVerified: false
-        },
-        createdAt: "2023-10-01T12:00:00Z",
-        updatedAt: "2023-10-01T12:00:00Z"
-    }
-];
-
 const BoardMembersPage = () => {
     // Hooks
     const { boardId } = useParams();
@@ -103,7 +16,7 @@ const BoardMembersPage = () => {
     const logout = useLogout();
 
     // State Management
-    const [members, setMembers] = useState(mockMembers);
+    const [members, setMembers] = useState([]);
     const [membersLoading, setMembersLoading] = useState(true);
     const [addMemberLoading, setAddMemberLoading] = useState(false);
     const [username, setUsername] = useState("");
@@ -186,22 +99,13 @@ const BoardMembersPage = () => {
                 console.log(errorData);
             }
 
-            const message = await response.json();
+            const responseData = await response.json();
 
-            setMembers(prev => {
-                const updatedMembers = [...prev];
-                const index = updatedMembers.findIndex(
-                    member => member?.user?._id === userId
-                );
+            setMembers(prevMembers => 
+                prevMembers.filter(member => member._id !== responseData.memberId)
+            );
 
-                if (index !== -1) {
-                    updatedMembers.splice(index, 1);
-                }
-
-                return updatedMembers;
-            });
-
-            toast.success(message.message);
+            toast.success(responseData.message);
 
         } catch (error) {
             console.log("Error:", error);

@@ -191,7 +191,7 @@ const BoardPage = () => {
 
       // Update the list array to remove the deleted list from the UI
       setLists(prevLists => 
-        prevLists.filter(list => list._id === deletedListData._id)
+        prevLists.filter(list => list._id !== deletedListData.list?._id)
       );
 
       setShowDeleteListModal(false);
