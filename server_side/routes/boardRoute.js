@@ -37,7 +37,7 @@ router.put("/update/:id", authWare, board.updateBoard);
  */
 router.post(
     "/:boardId/add-member", authWare,
-    permission.addRemDelPermission, board.addMember
+    permission.addRemDelPermission, members.addMember
 );
 
 /**
