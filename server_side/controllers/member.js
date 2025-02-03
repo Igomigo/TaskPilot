@@ -22,9 +22,6 @@ exports.getBoardMembers = async (req, res) => {
             board: boardId
         }).populate("user");
 
-        console.log("Members Data:", members);
-        console.log("members count:", members.length);
-
         // Return a response to the client
         return res.status(200).json(members);
 
