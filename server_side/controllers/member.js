@@ -81,8 +81,12 @@ exports.addMember = async (req, res) => {
 
         await logger.save();
 
+        // Send a request for the member data and populate the user field
+        const memberData = await Member.findById(member._id)
+        .populate("user");
+
         // return a response to the client
-        return res.status(200).json(member);
+        return res.status(200).json(memberData);
 
     } catch (err) {
         console.log(`${err}`);
