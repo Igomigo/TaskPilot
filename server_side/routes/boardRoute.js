@@ -51,7 +51,7 @@ router.get("/:boardId/members", authWare, members.getBoardMembers);
  * url: http://localhost:3000/b/:boardId/:userId
  */
 router.delete(
-    "/:boardId/:userId", authWare,
+    "/:boardId/:memberUserId", authWare,
     permission.addRemDelPermission, members.removeMember
 );
 
