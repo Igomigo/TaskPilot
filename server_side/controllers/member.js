@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Board = require("../models/board");
 const Member = require("../models/member");
+const ActivityLog = require("../models/activityLog");
 
 exports.getBoardMembers = async (req, res) => {
     // Returns an array of members for a particular board
