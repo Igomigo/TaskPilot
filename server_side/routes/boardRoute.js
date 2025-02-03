@@ -52,7 +52,7 @@ router.get("/:boardId/members", authWare, members.getBoardMembers);
  */
 router.delete(
     "/:boardId/:userId", authWare,
-    permission.addRemDelPermission, board.removeMember
+    permission.addRemDelPermission, members.removeMember
 );
 
 /**

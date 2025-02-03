@@ -52,7 +52,7 @@ exports.removeMember = async (req, res) => {
             });
         }
 
-        // Check that the member is not the current_user
+        // Prevent the user from removing themselves
         if (current_user._id.toString() === memberUserId.toString()) {
             return res.status(403).json({
                 error: true,
@@ -73,33 +73,23 @@ exports.removeMember = async (req, res) => {
             });
         }
 
-        // Find the index of that particular user on the board members array
-        const memberIndex = board.members.findIndex(
-            member => member._id.toString() === memberUserId.toString()
+        // Delete the user record from the boards
+        await Board.updateOne(
+            { _id: boardId },
+            { $pull: { members: memberUserId } }
         );
 
-        if (memberIndex === -1) {
-            return res.status(404).json({
-                error: true,
-                message: "Cannot delete, not a member of the board"
-            });
-        }
-
-        // Delete the user record from the boards
-        board.members.splice(memberIndex, 1);
-        await board.save();
-
-        // Return a response back to the client
+        // Return a success response back to the client
         return res.status(200).json({
             message: "User successfully removed from the board",
             memberId: deletedMember._id
         });
 
     } catch (error) {
-        console.log("Error:", error.message);
+        console.error("Error removing member:", error); // More helpful logging
         return res.status(500).json({
             error: true,
-            message: `${error.message}`
+            message: "Internal server error"
         });
     }
 }
