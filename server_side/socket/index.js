@@ -99,7 +99,7 @@ function setupSocketServer(io) {
                     io.to(newCard.boardId).emit("cardCreated", savedCard);
 
                 } catch (error) {
-                    console.log("Error adding new card:", error.message);
+                    console.log("Error adding new card:", error);
                 }
             }
         });

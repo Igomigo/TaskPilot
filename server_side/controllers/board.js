@@ -246,6 +246,19 @@ exports.removeMember = async (req, res) => {
         }
         console.log("Board found");
 
+        // Check if the member is a valid member
+        const member = await Member.findOne({
+            board: boardId,
+            user: userId
+        });
+
+        if (!member) {
+            return res.status(404).json({
+                error: true,
+                message: "Member not found"
+            });
+        }
+
         // // Check if user is a member of the board
         // if (!board.members.includes(userId)) {
         //     return res.status(404).json({
@@ -253,12 +266,12 @@ exports.removeMember = async (req, res) => {
         //     });
         // }
 
-        console.log("board.members:", board.members); // Log the array of members
-        console.log("userId:", userId); // Log the userId being searched
-        console.log("Checking each member:");
-        board.members.forEach((member, index) => {
-            console.log(`Index ${index}: member=${member.toString()}, matches=${member.toString() === userId.toString()}`);
-        });
+        // console.log("board.members:", board.members); // Log the array of members
+        // console.log("userId:", userId); // Log the userId being searched
+        // console.log("Checking each member:");
+        // board.members.forEach((member, index) => {
+        //     console.log(`Index ${index}: member=${member.toString()}, matches=${member.toString() === userId.toString()}`);
+        // });
 
         // Find the index of the user in the members array
         console.log("Finding the index of the user in the board members field...");
@@ -289,22 +302,19 @@ exports.removeMember = async (req, res) => {
         });
         await logger.save();
 
-        // emit the event to all connected clients
-        // const io = req.app.get("socketio");
-        // io.to(board._id).emit("removeMember", board);
-
         console.log("Operation successful");
 
         // return a response to the client
         return res.status(200).json({
-            message: "User successfully removed from the board"
+            message: "User successfully removed from the board",
+            memberId: member._id
         });
 
     } catch (err) {
         console.log(`${err}`);
 
         return res.status(500).json({
-            error: `An internal error occured: ${err.message}`
+            error: `An internal error occurred: ${err.message}`
         }); 
     }
 }
