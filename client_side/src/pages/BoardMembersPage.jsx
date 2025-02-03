@@ -63,10 +63,7 @@ const BoardMembersPage = () => {
             // Update state
             setUsername("");
 
-            setMembers(prev => {
-                const updatedMembersArray = [...prev];
-                return [...updatedMembersArray, newMember];
-            });
+            setMembers(prev => [...prev, newMember]);
 
             toast.success(`${username} has been added to the board`);
             
@@ -142,11 +139,11 @@ const BoardMembersPage = () => {
                     throw new Error("Error retrieving board members data");
                 }
 
-                const members = await response.json();
-                console.log("Members:", members);
+                const newMembers = await response.json();
+                console.log("Members:", newMembers);
 
                 // Update the members state
-                setMembers(members);
+                setMembers(newMembers);
 
             } catch (error) {
                 console.log("An error occured:", error.message);
@@ -158,7 +155,7 @@ const BoardMembersPage = () => {
 
         getMembers();
 
-    }, [user, boardId]);
+    }, [user]);
 
     return (
         <div className='container overflow-auto bg-bg-color'>
