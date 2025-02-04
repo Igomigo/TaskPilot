@@ -5,17 +5,32 @@ const Log = require("../models/activityLog");
 exports.getAllActivities = async (req, res) => {
     // Retrieves all log activity for a user
     const current_user = req.current_user;
-
-    console.log(current_user);
+    let { page, limit } = req.query;
 
     try {
-        console.log("Request git to activity log");
-        const activityLog = await Log.find({ createdBy: current_user._id });
+        // Convert query parameter to numbers and set defaults
+        page = parseInt(page) || 1;
+        limit = parseInt(limit) || 10;
+        const offset = (page - 1) * limit;
+
+        // Fetch the paginated data set
+        const activityLog = await Log.find({ createdBy: current_user._id })
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit);
+
+        // Count the number of documents to determine if there are more
+        const totalLogs = await Log.countDocuments({ createdBy: current_user._id });
+
+        const hasMore = (offset + limit) < totalLogs;
 
         console.log(activityLog);
 
         // Return response to the client
-        return res.status(200).json(activityLog);
+        return res.status(200).json({
+            activityLogs: activityLog,
+            hasMore
+        });
 
     } catch (err) {
         console.log(`${err}`);
