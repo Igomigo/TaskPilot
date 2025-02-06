@@ -109,6 +109,9 @@ const LoginPage = () => {
                         }
                     </button>
                     <div className='text-sm text-center'>
+                        <Link to={"/send-reset-link"} className='text-blue-500 hover:text-blue-600'>Forgot Password?</Link>
+                    </div>
+                    <div className='text-sm text-center'>
                         <span className='text-gray-400'>Don't have an account yet? </span>
                         <Link to={"/register"} className='text-green hover:text-emerald-700'>register</Link>
                     </div>
