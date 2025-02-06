@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 
 const sendResetEmail = async (req, res) => {
     const { email } = req.body;
-    const passwordResetLink = `${process.env.CLIENT_URL}/password-reset-link/${user._id}`;
 
     try {
         // Validate that the email received is the actual valid user email
@@ -15,6 +14,9 @@ const sendResetEmail = async (req, res) => {
                 message: "User not found! kindly enter your email for this account"
             });
         }
+
+        // Construct the reset password link url
+        const passwordResetLink = `${process.env.CLIENT_URL}/reset-password/${user._id}`;
 
         // Setup nodemailer transporter to send reset password link to the user's email
         const transporter = nodemailer.createTransport({

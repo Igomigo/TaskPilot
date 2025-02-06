@@ -23,13 +23,13 @@ router.put("/update", authWare, user.updateUser);
  * POST request to send password reset email
  * url: http://localhost:3000/u/send-reset-password-link
  */
-router.put("/send-reset-password-link", sendResetEmail);
+router.post("/send-reset-password-link", sendResetEmail);
 
 /**
  * POST request to reset password
  * url: http://localhost:3000/u/reset-password
  */
-router.put("/reset-password", resetPassword);
+router.post("/reset-password", resetPassword);
 
 
 module.exports = router;
