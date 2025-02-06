@@ -4,15 +4,15 @@ const bcrypt = require("bcrypt");
 
 const sendResetEmail = async (req, res) => {
     const { email } = req.body;
-    const current_user = req.current_user;
-    const passwordResetLink = `${process.env.CLIENT_URL}/password-reset-link/${current_user._id}`;
+    const passwordResetLink = `${process.env.CLIENT_URL}/password-reset-link/${user._id}`;
 
     try {
         // Validate that the email received is the actual valid user email
-        if (current_user.email !== email) {
-            return res.status(400).json({
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
                 error: true,
-                message: "Wrong email! kindly enter your email for this account"
+                message: "User not found! kindly enter your email for this account"
             });
         }
 
@@ -61,7 +61,6 @@ const sendResetEmail = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     const { userId, password } = req.body;
-    const current_user = req.current_user;
 
     try {
         // Check that the actual user exists through the userId
