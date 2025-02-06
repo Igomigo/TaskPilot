@@ -45,7 +45,7 @@ app.use("/b", boardRoute);
 app.use("/l", listRoute);
 app.use("/b", cardRoute);
 app.use("/c", commentRoute);
-app.use("/b", logRoute);
+app.use("/b/logs", logRoute);
 
 // Test the server response
 app.get("/ping", authWare, (req, res) => {

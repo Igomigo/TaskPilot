@@ -8,19 +8,19 @@ const router = express.Router();
 
 /**
  * GET request for activity logs for a user
- * url: http://localhost:3000/b/activity-log
+ * url: http://localhost:3000/b/logs/activities
  */
-router.get("/activity-log", authWare, Log.getAllActivities);
+router.get("/activities", authWare, Log.getAllActivities);
 
 /**
  * GET request for activity logs within the board
- * url: http://localhost:3000/b/activity/:boardId
+ * url: http://localhost:3000/b/logs/activity/:boardId
  */
 router.get("/activity/:boardId", authWare, Log.getBoardActivities);
 
 /**
  * GET request for activity log within the card level
- * url: http://localhost:3000/b/:boardId/activity/:cardId
+ * url: http://localhost:3000/b/logs/:boardId/activity/:cardId
  */
 router.get("/:boardId/activity/:cardId", authWare, Log.getCardActivities);
 

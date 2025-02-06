@@ -24,8 +24,6 @@ exports.getAllActivities = async (req, res) => {
 
         const hasMore = (offset + limit) < totalLogs;
 
-        console.log(activityLog);
-
         // Return response to the client
         return res.status(200).json({
             activityLogs: activityLog,
