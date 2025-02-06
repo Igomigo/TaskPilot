@@ -59,6 +59,40 @@ const sendResetEmail = async (req, res) => {
     }
 };
 
-const resetPassword = async (req, res) => {};
+const resetPassword = async (req, res) => {
+    const { userId, password } = req.body;
+    const current_user = req.current_user;
+
+    try {
+        // Check that the actual user exists through the userId
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: "User not found"
+            });
+        }
+
+        // hash the new password
+        const hashedPwd = await bcrypt.hash(password, 10);
+
+        // Update the password field with the new hashed password
+        user.password = hashedPwd;
+        await user.save();
+
+        // Return a response back to the client
+        return res.status(200).json({
+            status: "success",
+            message: "Password reset operation successful"
+        });
+
+    } catch (error) {
+        console.log("Error resetting password:", error);
+        return res.status(500).json({
+            error: true,
+            message: "Password reset operation failed"
+        });
+    }
+};
 
 module.exports = { sendResetEmail, resetPassword };
