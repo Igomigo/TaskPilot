@@ -20,7 +20,7 @@ router.get("/account", authWare, user.getUser);
 router.put("/update", authWare, user.updateUser);
 
 /**
- * POST request to send password reset email
+ * POST request to send password reset link
  * url: http://localhost:3000/u/send-reset-password-link
  */
 router.post("/send-reset-password-link", sendResetEmail);

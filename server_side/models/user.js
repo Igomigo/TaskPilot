@@ -20,6 +20,9 @@ const UserSchema = new Schema({
     profile_pic: {
         type: String
     },
+    resetPasswordToken: {
+        type: String
+    },
     isVerified: {
         type: Boolean,
         default: false

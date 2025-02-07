@@ -1,9 +1,11 @@
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require("uuid");
 
 const sendResetEmail = async (req, res) => {
     const { email } = req.body;
+    const resetPasswordToken = uuidv4().toString();
 
     try {
         // Validate that the email received is the actual valid user email
@@ -15,8 +17,12 @@ const sendResetEmail = async (req, res) => {
             });
         }
 
+        // Save the generated uuid token to the database
+        user.resetPasswordToken = resetPasswordToken;
+        await user.save();
+
         // Construct the reset password link url
-        const passwordResetLink = `${process.env.CLIENT_URL}/reset-password/${user._id}`;
+        const passwordResetLink = `${process.env.CLIENT_URL}/reset-password/${resetPasswordToken}`;
 
         // Setup nodemailer transporter to send reset password link to the user's email
         const transporter = nodemailer.createTransport({
@@ -62,11 +68,13 @@ const sendResetEmail = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-    const { userId, password } = req.body;
+    const { resetToken, password } = req.body;
 
     try {
         // Check that the actual user exists through the userId
-        const user = await User.findById(userId);
+        const user = await User.findOne({
+            resetPasswordToken: resetToken
+        });
         if (!user) {
             return res.status(404).json({
                 error: true,
