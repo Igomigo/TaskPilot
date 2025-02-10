@@ -6,9 +6,9 @@ import toast from 'react-hot-toast';
 const PasswordResetPage = () => {
   // Hooks
   const navigate = useNavigate();
-  const { userId } = useParams();
+  const { resetToken } = useParams();
 
-  console.log(userId);
+  console.log(resetToken);
 
   // State Management
   const [password, setPassword] = useState("");
@@ -29,7 +29,7 @@ const PasswordResetPage = () => {
     try {
       const response = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ userId, password }),
+        body: JSON.stringify({ resetToken, password }),
         headers: {
           "Content-Type": "application/json"
         }
@@ -50,7 +50,6 @@ const PasswordResetPage = () => {
 
     } catch (error) {
       console.error("Error:", error);
-      toast.error("error.message");
     } finally {
       setLoading(false);
     }

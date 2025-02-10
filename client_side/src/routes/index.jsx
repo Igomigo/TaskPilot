@@ -69,7 +69,7 @@ const router = createBrowserRouter([{
             element: <SendPasswordResetLink />
         },
         {
-            path: "reset-password/:userId",
+            path: "reset-password/:resetToken",
             element: <PasswordResetPage />
         }
     ]
