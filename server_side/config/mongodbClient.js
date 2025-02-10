@@ -10,10 +10,10 @@ const dbConfig = async () => {
     try {
         console.log("Establishing a connection with mongoDB...");
         // await mongoose.connect(process.env.MONGODB_URI);
-        await mongoose.connect("mongodb://localhost:27017/TaskPilotDb");
+        await mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017/TaskPilotDb");
         console.log("Connection to the mongodb database successful");
     } catch (err) {
-        console.log(`Error while connecting to mongodb: ${err.message}`);
+        console.log(`Error while connecting to mongodb: ${err}`);
     }
 }
 

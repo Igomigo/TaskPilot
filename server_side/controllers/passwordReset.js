@@ -78,7 +78,7 @@ const resetPassword = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 error: true,
-                message: "User not found"
+                message: "Invalid reset link, kindly use the latest link"
             });
         }
 
