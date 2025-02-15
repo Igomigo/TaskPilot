@@ -50,17 +50,19 @@ const BoardMembersPage = () => {
                 logout();
             }
 
-            if (response.status === 404) {
-                const result = await response.json();
-                console.log("User does not exist:", result.message);
-                toast.error(result.message || "User does niot exist");
-            }
+            // if (response.status === 404) {
+            //     const result = await response.json();
+            //     console.log("User does not exist:", result.message);
+            //     toast.error(result.message || "User does niot exist");
+            // }
 
             if (response.status === 409) {
                 toast.success(`${username} is already a member of this board`);
             }
 
             if (!response.ok) {
+                const errorData = await response.json();
+                toast.error(errorData.message);
                 throw new Error("Error adding a new member to the board");
             }
 
