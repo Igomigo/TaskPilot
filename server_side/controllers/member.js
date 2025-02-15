@@ -45,10 +45,17 @@ exports.addMember = async (req, res) => {
 
         if (!board) {
             console.log(`Board <${board.title}> not found`);
-            return res.status(404).json({message: "Board not found"});
+            return res.status(400).json({message: "Board not found"});
         }
 
         const user = await User.findOne({username: username});
+
+        if (!user || Object.keys(user).length < 1) {
+            return res.status(404).json({
+                error: true,
+                message: "User does not exist, kindly check for typos"
+            });
+        }
 
         if (user && board.members.includes(user._id)) {
             console.log("Member already exists in the board");

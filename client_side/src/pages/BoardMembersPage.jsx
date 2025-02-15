@@ -50,6 +50,11 @@ const BoardMembersPage = () => {
                 logout();
             }
 
+            if (response.status === 404) {
+                const result = await response.json();
+                toast.error(result.message);
+            }
+
             if (response.status === 409) {
                 toast.success(`${username} is already a member of this board`);
             }
