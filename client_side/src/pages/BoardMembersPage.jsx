@@ -52,7 +52,8 @@ const BoardMembersPage = () => {
 
             if (response.status === 404) {
                 const result = await response.json();
-                toast.error(result.message);
+                console.log("User does not exist:", result.message);
+                toast.error(result.message || "User does niot exist");
             }
 
             if (response.status === 409) {
