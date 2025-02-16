@@ -8,9 +8,7 @@ const SettingsPage = () => {
   console.log("State in settings page:", user);
 
   return (
-    <div>
-      Settings Page
-    </div>
+    <div className='text-center text-gray-400 pt-2'>Settings Page, still under construction</div>
   )
 }
 
