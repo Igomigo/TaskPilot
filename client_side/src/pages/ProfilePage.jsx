@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import { useDispatch, useSelector } from 'react-redux';
 import { FaImage } from "react-icons/fa6";
@@ -8,13 +8,14 @@ import uploadFile from '../helpers/UploadFile';
 import { setUser } from '../redux/userSlice';
 import Loading from '../components/loading';
 import useLogout from '../hooks/useLogout';
+import { IoIosArrowBack } from "react-icons/io";
 
 const ProfilePage = () => {
     //Hooks
     const params = useParams();
     const user = useSelector(state => state?.user);
     const dispatch = useDispatch();
-    const navigate = useNavigation();
+    const navigate = useNavigate();
     const handleLogout = useLogout();
 
     useEffect(() => {
@@ -110,11 +111,20 @@ const ProfilePage = () => {
         }
     }
 
+    // Return back to previous page
+    const returnToPreviousPage = () => {
+        navigate(-1);
+    }
+
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="max-w-2xl mx-auto bg-form-bg shadow-md rounded-lg overflow-hidden">
                 <div className="px-6 py-10">
-                    <h2 className="text-2xl font-semibold text-gray-300 text-center mb-6">Edit Your Profile</h2>
+                    <div className='lg:hidden flex'>
+                        <IoIosArrowBack onClick={returnToPreviousPage} className='lg:hidden focus:text-blue-600 mr-6 text-white' size={28}/>
+                        <h2 className="text-2xl font-semibold text-gray-300 text-center mb-6">Edit Your Profile</h2>
+                    </div>
+                    <h2 className="text-2xl hidden lg:block md:hidden font-semibold text-gray-300 text-center mb-6">Edit Your Profile</h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="flex flex-col items-center mb-6">
                             <div className="relative">
