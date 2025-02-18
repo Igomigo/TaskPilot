@@ -16,6 +16,7 @@ const listRoute = require("./routes/listRoute");
 const cardRoute = require("./routes/cardRoute");
 const commentRoute = require("./routes/commentRoute");
 const logRoute = require("./routes/activityLogRoutes");
+const notificationRoute = require("./routes/notificationRoute");
 const setupSocketServer = require("./socket/index");
 const { setIo } = require("./socket/io");
 
@@ -46,9 +47,10 @@ app.use("/l", listRoute);
 app.use("/b", cardRoute);
 app.use("/c", commentRoute);
 app.use("/b/logs", logRoute);
+app.use("/", notificationRoute);
 
 // Test the server response
-app.get("/ping", authWare, (req, res) => {
+app.get("/ping", (req, res) => {
     res.status(200).json("Server says pong");
     console.log("Pong");
 });
