@@ -24,10 +24,15 @@ exports.fetchNotifications = async (req, res) => {
         .skip(offset)
         .limit(limit);
 
+        // Determine if it has more data
+        const total = await Notification.countDocuments();
+        const hasMore = offset + limit < total;
+
         // Return a response to the client
         return res.status(200).json({
             status: "success",
-            notifications
+            notifications,
+            hasMore
         });
 
     } catch (err) {
