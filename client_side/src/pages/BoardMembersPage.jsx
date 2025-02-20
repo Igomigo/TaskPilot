@@ -74,6 +74,12 @@ const BoardMembersPage = () => {
             setMembers(prev => [...prev, newMember]);
 
             toast.success(`${username} has been added to the board`);
+
+            // Notify the new user of this action
+            const notifyData = {
+                userId: newMember.user._id
+            }
+            user?.socketConnection.emit("userAdded", notifyData);
             
         } catch (error) {
             console.log("Error:", error.message);
