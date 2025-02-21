@@ -7,7 +7,7 @@ import { IoIosArrowUp } from "react-icons/io";
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Avatar from './Avatar';
 import logout from '../hooks/useLogout';
 
@@ -21,6 +21,7 @@ const Topbar = ({ toggleSidebar, user }) => {
     const [toggleArrow, setToggleArrow] = useState(true);
     const [showUserPopup, setShowUserPopup] = useState(false);
     const userPopupRef = useRef(null);
+    const [notificationsCount, setNotificationsCount] = useState(0);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -35,6 +36,19 @@ const Topbar = ({ toggleSidebar, user }) => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    // useEffect(() => {
+    //     if (!user) {
+    //         return;
+    //     }
+
+    //     console.log("Socket Connection:", user.socketConnection);
+
+    //     user.socketConnection.on("newNotification", (notificationData) => {
+    //         // Update the notifications count
+    //         setNotificationsCount(prev => prev + 1);
+    //     });
+    // }, [user]);
 
     // Toggle between arrow down and arrow up
     const toggleArowFunction = () => {
@@ -65,6 +79,7 @@ const Topbar = ({ toggleSidebar, user }) => {
             <div className='flex ml-4 space-x-4 justify-center items-center'>
                 <Link to={"notifications"} className=''>
                     <IoNotifications title='notification' className='text-slate-300 hover:text-white' size={22}/>
+                    <div className='ronded-full bg-red text-white'>{notificationsCount}</div>
                 </Link>
                 <div onClick={toggleArowFunction} ref={userPopupRef} className='relative'>
                     <button className='flex rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-slate-300 justify-center items-center space-x-2'>

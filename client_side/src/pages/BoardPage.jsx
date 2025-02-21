@@ -9,18 +9,16 @@ import useLogout from '../hooks/useLogout';
 import { useRef } from 'react';
 import { MdGroups, MdDeleteSweep, MdClose } from "react-icons/md";
 import { IoMdArchive } from "react-icons/io";
-import io from "socket.io-client";
 import { LuClock4 } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa6";
 import { format } from 'date-fns';
-import { logout, setSocketConnection } from '../redux/userSlice';
+import { logout } from '../redux/userSlice';
 import Loading from '../components/loading';
 
 const BoardPage = () => {
   // Hooks
   const { boardId } = useParams();
   const user = useSelector(state => state?.user);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const activityModalRef = useRef(null);
   const handleLogout = useLogout();
@@ -34,7 +32,6 @@ const BoardPage = () => {
     title: "",
     position: 0
   });
-  const [newCard, setNewCard] = useState();
   const [listLoading, setlistLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
@@ -76,58 +73,6 @@ const BoardPage = () => {
 
     // Emit the new list event
     socketConnection.emit("newList", listData);
-    // Clear the input field
-    e.target.reset();
-    // Reset the newList state
-    setNewList({title: "", position: 0});
-    // Close the show list modal
-    setShowList(false);
-
-    // const token = user?.token;
-
-    // if (!token) {
-    //   navigate("/login");
-    //   return;
-    // }
-
-    // setlistLoading(true);
-
-    // try {
-    //   const response = await fetch(url, {
-    //     method: "POST",
-    //     body: JSON.stringify(listData),
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       "Authorization": `Bearer ${token}`
-    //     }
-    //   });
-
-    //   if (response.status === 401) {
-    //     // Token is invalid or expired, redirect to login
-    //     toast.error("Session expired, redirecting to login");
-    //     handleLogout();
-    //   }
-
-    //   if (!response.ok) {
-    //     throw new Error("An error occured");
-    //   }
-
-    //   const data = await response.json();
-    //   //console.log(data);
-    //   setLists(prev => [
-    //     ...prev,
-    //     data
-    //   ]);
-
-    //   setNewList("");
-    //   setShowList(false);
-
-    // } catch (error) {
-    //   console.log("Error:", error.message);
-
-    // } finally {
-    //   setlistLoading(false);
-    // }
   }
 
   // Toggle between card states
@@ -223,70 +168,7 @@ const BoardPage = () => {
 
     if (socketConnection && newCard.listId && newCard.title && newCard.boardId) {
       socketConnection.emit("newCard", newCard);
-      // Clear the input field
-      e.target.reset();
-      setCardLoading(false);
-      // Hide the card input form
-      toggleCardInputState(listId);
     }
-
-    // if (cardTitle.trim()) {
-    //   const url = `${import.meta.env.VITE_BACKEND_URL}/b/${listId}/card`;
-
-    //   const token = user?.token;
-
-    //   if (!token) {
-    //     console.warn("No token available; redirecting to login.");
-    //     navigate("/login");
-    //     return;
-    //   }
-
-    //  setCardLoading(true);
-
-      // try {
-      //   const response = await fetch(url, {
-      //     method: "POST",
-      //     body: JSON.stringify({title: cardTitle, boardId: boardId}),
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       "Authorization": `Bearer ${token}`
-      //     }
-      //   });
-
-      //   if (response.status === 401) {
-      //     // Token is invalid or expired, redirect to login
-      //     toast.error("Session expired, redirecting to login");
-      //     handleLogout();
-      //   }
-
-      //   if (response.status === 409) {
-      //     toast.error("Card already exists in this list");
-      //     setShowCardInputs(false);
-      //   }
-
-      //   if (!response.ok) {
-      //     throw new Error("An error occured");
-      //   }
-
-      //   const newCard = await response.json();
-
-      //   // Update the respective list's card array with the new card
-      //   setLists(prev => 
-      //     prev.map(list => 
-      //       list._id === listId ? {...list, cards: [...list.cards, newCard]} : list
-      //     )
-      //   );
-
-      //   e.target.reset();
-      //   toggleCardInputState(listId);
-
-      // } catch (error) {
-      //   console.log("Error:", error.message);
-
-      // } finally {
-      //   setCardLoading(false);
-      // }
-    //}
   }
 
   // Fetch board data
@@ -433,112 +315,106 @@ const BoardPage = () => {
     };
   }, []);
 
-  // Establish socket connection
+  // Socket events
   useEffect(() => {
-    const socketConnection = io(import.meta.env.VITE_BACKEND_URL, {
-      auth: {
-        token: localStorage.getItem("token")
-      }
-    });
-
+    const socketConnection = user?.socketConnection;
     if (socketConnection) {
-      dispatch(setSocketConnection(socketConnection));
+      // Emit the join board event
+      socketConnection.emit("joinBoard", boardId);
+
+      socketConnection.on("overdueCards", handleOverdueCards);
+      socketConnection.on("createdList", handleCreatedList);
+      socketConnection.on("cardCreated", handleCardCreated);
+      socketConnection.on("alreadyExists", handleAlreadyExists);
+
+      return () => {
+        socketConnection.off("overdueCards", handleOverdueCards)
+        socketConnection.off("createdList", handleCreatedList)
+        socketConnection.off("cardCreated", handleCardCreated)
+        socketConnection.off("alreadyExists", handleAlreadyExists)
+      }
     }
 
-    //console.log("Socket connection:", socketConnection);
+  }, [user?.socketConnection, boardId]);
 
-    // Listen for the auth error event
-    socketConnection.on("Auth_error", data => {
-      toast.error("Session expired, kindly log in again");
-      handleLogout();
-    });
+  // Socket event handlers
+  const handleOverdueCards = (overdueCards) => {
+    console.log("Overdue card found");
+    setLists(prev => {
+      const updatedLists = [...prev];
 
-    // Emit the join board event
-    socketConnection.emit("joinBoard", boardId);
+      overdueCards.forEach(overdueCard => {
+        const listIndex = updatedLists.findIndex(list =>
+          list.cards.some(card => card._id === overdueCard._id)
+        );
 
-    // Listen for the overdue cards event and update the UI
-    socketConnection.on("overdueCards", overdueCards => {
-      setLists(prev => {
-        const updatedLists = [...prev];
-
-        overdueCards.forEach(overdueCard => {
-          const listIndex = updatedLists.findIndex(list =>
-            list.cards.some(card => card._id === overdueCard._id)
+        if (listIndex != -1) {
+          const cardIndex = updatedLists[listIndex].cards.findIndex(card =>
+            card._id === overdueCard._id
           );
 
-          if (listIndex != -1) {
-            const cardIndex = updatedLists[listIndex].cards.findIndex(card =>
-              card._id === overdueCard._id
-            );
+          if (cardIndex != -1) {
+            const existingCard = updatedLists[listIndex].cards[cardIndex];
 
-            if (cardIndex != -1) {
-              const existingCard = updatedLists[listIndex].cards[cardIndex];
-
-              // Format the existing card's dueDate
-              if (existingCard.dueDate) {
-                existingCard.dueDate = format(new Date(existingCard.dueDate), 'MMM dd, yyyy');
-              }
-
-              // Update the card with data from the server
-              updatedLists[listIndex].cards[cardIndex] = {
-                ...existingCard,
-                ...overdueCard
-              };
+            // Format the existing card's dueDate
+            if (existingCard.dueDate) {
+              existingCard.dueDate = format(new Date(existingCard.dueDate), 'MMM dd, yyyy');
             }
-          }
-        });
 
-        return updatedLists;
+            // Update the card with data from the server
+            updatedLists[listIndex].cards[cardIndex] = {
+              ...existingCard,
+              ...overdueCard
+            };
+          }
+        }
       });
+
+      return updatedLists;
     });
+  };
 
-    socketConnection.on("createdList", newList => {
-      if (newList) {
-        setLists(prev => {
-          // Check is list already exists
-          const listExists = prev.some((list) => list._id === newList._id);
-          if (!listExists) {
-            return [...prev, newList]
-          }
-          return prev;
-        });
-      }
-    });
+  const handleCreatedList = (newList) => {
+    if (newList) {
+      setLists(prev => {
+        // Check is list already exists
+        const listExists = prev.some((list) => list._id === newList._id);
+        if (!listExists) {
+          return [...prev, newList]
+        }
+        return prev;
+      });
 
-    // Listen for the newCard event and update the UI
-    socketConnection.on("cardCreated", newCard => {
-      console.log("New card event received successfully:", newCard);
-      // Update the respective list's card array with the new card
-        setLists(prev => 
-        prev.map(list => 
-          list._id === newCard?.listId 
-            ? {...list, cards: list.cards.some(card => card._id === newCard._id) 
-                ? list.cards 
-                : [...list.cards, newCard]
-              } 
-            : list
-        )
-      );
-    });
+      // Reset the newList state
+      setNewList({title: "", position: 0});
+      // Close the show list modal
+      setShowList(false);
+    }
+  };
 
-    // Listen for the card already exists event
-    socketConnection.on("alreadyExists", message => {
-      console.log("Already exists event triggered");
-      toast.error(message);
-    });
+  const handleCardCreated = (newCard) => {
+    console.log("New card event received successfully:", newCard);
+    // Update the respective list's card array with the new card
+    setLists(prev => 
+      prev.map(list => 
+        list._id === newCard?.listId 
+          ? {...list, cards: list.cards.some(card => card._id === newCard._id) 
+              ? list.cards 
+              : [...list.cards, newCard]
+            } 
+          : list
+      )
+    );
 
-    return () => {
-      console.log("Cleaning up socket listeners");
-      socketConnection.off("cardCreated");
-      socketConnection.off("createdList");
-      socketConnection.off("overdueCards");
-      socketConnection.off("alreadyExists");
-      socketConnection.off("Auth_error");
-      //socketConnection.emit("leaveBoard", boardId);
-      //socketConnection.disconnect();
-    };
+    setCardLoading(false);
+    // Hide the card input form
+    toggleCardInputState(newCard?.listId);
+  }
 
-  }, [boardId, dispatch]);
+  const handleAlreadyExists = (message) => {
+    console.log("Already exists event triggered");
+    toast.error(message);
+  }
 
   if (pageLoading) return <div className='h-full flex items-center justify-center'><Loading /></div>
 

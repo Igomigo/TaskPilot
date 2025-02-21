@@ -4,10 +4,41 @@ import toast, { Toaster } from 'react-hot-toast';
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import { MdError } from "react-icons/md";
+import { useDispatch, useSelector } from 'react-redux';
+import io from "socket.io-client";
+import { setSocketConnection } from './redux/userSlice';
+import useLogout from './hooks/useLogout';
 
 const App = () => {
+  // Hooks
+  const dispatch = useDispatch();
+  const user = useSelector(state => state?.user);
+  const handleLogout = useLogout();
+
   // State Management
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  // Establish socket connection
+  useEffect(() => {
+    if (user && !user.socketConnection) {
+      const socketConnection = io(import.meta.env.VITE_BACKEND_URL, {
+        auth: {
+          token: user?.token
+        }
+      });
+
+      socketConnection.on("connect", () => {
+        console.log("Socket connected");
+        dispatch(setSocketConnection(socketConnection));
+      });
+
+      socketConnection.on("Auth_error", data => {
+        toast.error("Session expired, kindly log in again");
+        handleLogout();
+      });
+    }
+    
+  }, [user, dispatch, handleLogout]);
 
   useEffect(() => {
     // Function to update offLine status
