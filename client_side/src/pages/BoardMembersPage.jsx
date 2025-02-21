@@ -50,12 +50,6 @@ const BoardMembersPage = () => {
                 logout();
             }
 
-            // if (response.status === 404) {
-            //     const result = await response.json();
-            //     console.log("User does not exist:", result.message);
-            //     toast.error(result.message || "User does niot exist");
-            // }
-
             if (response.status === 409) {
                 toast.success(`${username} is already a member of this board`);
             }
@@ -76,10 +70,14 @@ const BoardMembersPage = () => {
             toast.success(`${username} has been added to the board`);
 
             // Notify the new user of this action
-            const notifyData = {
-                userId: newMember.user._id
+            if (newMember) {
+                const notifyData = {
+                    userId: newMember.user._id,
+                    senderName: user?.username,
+                    boardId: boardId
+                }
+                user?.socketConnection.emit("userAdded", notifyData);
             }
-            user?.socketConnection.emit("userAdded", notifyData);
             
         } catch (error) {
             console.log("Error:", error.message);
