@@ -5,8 +5,8 @@ const authWare = require("../middlewares/authWare");
 
 /**
  * GET request to fetch all notifications for a specific user
- * url: http://localhost:3000/notifications
+ * url: http://localhost:3000/:userId/notifications
  */
-router.get("/notifications", authWare, notifications.fetchNotifications);
+router.get("/:userId/notifications", authWare, notifications.fetchNotifications);
 
 module.exports = router;

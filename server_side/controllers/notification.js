@@ -1,7 +1,7 @@
 const Notification = require("../models/notification");
 
 exports.fetchNotifications = async (req, res) => {
-    const { userId } = req.body
+    const { userId } = req.params;
     const current_user = req.current_user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;

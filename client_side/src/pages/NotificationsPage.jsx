@@ -129,12 +129,11 @@ const NotificationsPage = () => {
         return;
       }
 
-      const url = `${import.meta.env.VITE_BACKEND_URL}/notifications`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/${user?._id}/notifications`;
 
       try {
         const response = await fetch(url, {
           method: "GET",
-          body: { userId: user._id },
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${user.token}`
