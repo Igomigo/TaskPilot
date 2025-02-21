@@ -37,18 +37,16 @@ const Topbar = ({ toggleSidebar, user }) => {
         };
     }, []);
 
-    // useEffect(() => {
-    //     if (!user) {
-    //         return;
-    //     }
+    useEffect(() => {
+        const socketConnection = user?.socketConnection;
 
-    //     console.log("Socket Connection:", user.socketConnection);
-
-    //     user.socketConnection.on("newNotification", (notificationData) => {
-    //         // Update the notifications count
-    //         setNotificationsCount(prev => prev + 1);
-    //     });
-    // }, [user]);
+        if (socketConnection) {
+            socketConnection.on("newNotification", (notificationData) => {
+                // Update the notifications count
+                setNotificationsCount(prev => prev + 1);
+            });
+        }
+    }, [user?.socketConnection]);
 
     // Toggle between arrow down and arrow up
     const toggleArowFunction = () => {
@@ -77,9 +75,13 @@ const Topbar = ({ toggleSidebar, user }) => {
                 </div>
             </div>
             <div className='flex ml-4 space-x-4 justify-center items-center'>
-                <Link to={"notifications"} className=''>
+                <Link onClick={() => setNotificationsCount(0)} to={"notifications"} className='relative'>
                     <IoNotifications title='notification' className='text-slate-300 hover:text-white' size={22}/>
-                    <div className='ronded-full bg-red text-white'>{notificationsCount}</div>
+                    {
+                        notificationsCount > 0 && (
+                            <div className='absolute text-xs font-bold bottom-2 right-0 rounded-full text-red-500'>{notificationsCount}</div>
+                        )
+                    }
                 </Link>
                 <div onClick={toggleArowFunction} ref={userPopupRef} className='relative'>
                     <button className='flex rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-slate-300 justify-center items-center space-x-2'>
