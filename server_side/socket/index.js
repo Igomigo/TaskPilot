@@ -7,6 +7,7 @@ const Board = require("../models/board");
 const Comment = require("../models/comment");
 const ActivityLog = require("../models/activityLog");
 const User = require("../models/user");
+const Notification = require("../models/notification");
 
 function setupSocketServer(io) {
     // Middleware for authentication
@@ -206,6 +207,38 @@ function setupSocketServer(io) {
                 } catch (error) {
                     console.log("Error adding comment:", error.message);
                 }
+            }
+        });
+
+        // Notify User when added to a board
+        socket.on("userAdded", async (data) => {
+            try {
+                // Check that the user exists
+                const user = await User.findById(data?.userId);
+                if (!user) {
+                    console.log("User id not found");
+                }
+
+                // Fetch the board title from the database
+                const board = await Board.findById(data.boardId);
+                if (!board) {
+                    console.log("Board not found");
+                }
+
+                // Create the notification document
+                const notification = new Notification({
+                    userId: data.userId,
+                    type: "Targeted",
+                    message: `${data.senderName} added you to the board: ${board.title}`
+                });
+
+                const savedNotification = await notification.save();
+
+                // Emit notification data to the newly added user
+                io.to(data.userId).emit("newNotification", savedNotification);
+
+            } catch (error) {
+                console.log("Error creating notification:", error.message);
             }
         });
 
