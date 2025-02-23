@@ -242,6 +242,31 @@ function setupSocketServer(io) {
             }
         });
 
+        // Notify User when removed from a board
+        socket.on("removeUser", async (data) => {
+            try {
+                // Retrieve the board data
+                const board = await Board.findById(data.boardId);
+                if (!board) {
+                    console.log("Board not found");
+                }
+
+                // Create the notification data
+                const notification = new Notification({
+                    type: "Targeted",
+                    message: `${data.senderName} removed you from the board: ${board.title}`,
+                    userId: data.userId
+                });
+                const savedNotification = await notification.save();
+
+                // Emit this action to the client
+                io.to(data.userId).emit("newNotification", savedNotification);
+
+            } catch (error) {
+                console.log("Error creating notification data after user is removed from a board");
+            }
+        });
+
         socket.on("disconnect", (socket) => {
             console.log("User disconnected:", socket.userId);
         });
