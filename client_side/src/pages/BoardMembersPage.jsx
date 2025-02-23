@@ -116,6 +116,15 @@ const BoardMembersPage = () => {
 
             toast.success(responseData.message);
 
+            if (responseData.message) {
+                const data = {
+                    senderName: user?.username,
+                    userId,
+                    boardId
+                };
+                user?.socketConnection.emit("removeUser", data);
+            }
+
         } catch (error) {
             console.log("Error:", error);
             toast.error("Failed to remove member from board");
