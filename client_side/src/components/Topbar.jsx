@@ -21,6 +21,7 @@ const Topbar = ({ toggleSidebar, user }) => {
     const [toggleArrow, setToggleArrow] = useState(true);
     const [showUserPopup, setShowUserPopup] = useState(false);
     const userPopupRef = useRef(null);
+    const [newNotifications, setNewNotifications] = useState([]);
     const [notificationsCount, setNotificationsCount] = useState(0);
 
     useEffect(() => {
@@ -42,11 +43,26 @@ const Topbar = ({ toggleSidebar, user }) => {
 
         if (socketConnection) {
             socketConnection.on("newNotification", (notificationData) => {
-                // Update the notifications count
-                setNotificationsCount(prev => prev + 1);
+                // Update the notifications array
+                setNewNotifications(prev => {
+                    let isExist = false;
+                    prev.forEach(notification => {
+                        if (notification._id === notificationData._id) {
+                            isExist = true;
+                            return;
+                        }
+                    });
+                    if (isExist) return prev;
+                    return [...prev, notificationData];
+                });
             });
         }
     }, [user?.socketConnection]);
+
+    // Update the notifications count when the new notifications state updates
+    useEffect(() => {
+        setNotificationsCount(newNotifications.length);
+    }, [newNotifications]);
 
     // Toggle between arrow down and arrow up
     const toggleArowFunction = () => {
@@ -75,7 +91,7 @@ const Topbar = ({ toggleSidebar, user }) => {
                 </div>
             </div>
             <div className='flex ml-4 space-x-4 justify-center items-center'>
-                <Link onClick={() => setNotificationsCount(0)} to={"notifications"} className='relative'>
+                <Link onClick={() => setNewNotifications([])} to={"notifications"} className='relative'>
                     <IoNotifications title='notification' className='text-slate-300 hover:text-white' size={22}/>
                     {
                         notificationsCount > 0 && (
